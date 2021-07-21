@@ -40,6 +40,7 @@ def gen(camera):
 
 
 @gzip.gzip_page
+@csrf_exempt
 def index(request):
     try:
         cam = VideoCamera()
