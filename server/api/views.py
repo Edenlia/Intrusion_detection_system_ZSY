@@ -45,8 +45,8 @@ def login(request):
         dic['message'] = "Wrong Password"
         return HttpResponse(json.dumps(dic))
 
-    dic = {'message': "hello"}
-    return HttpResponse(json.dumps(dic))
+    # dic = {'message': "hello"}
+    # return HttpResponse(json.dumps(dic))
 
 
 # 注册账号
@@ -79,3 +79,31 @@ def register(request):
         dic['status'] = "Failed"
         dic['message'] = "User exist"
         return HttpResponse(json.dumps(dic))
+
+
+# 更改密码
+# 根据用户主键id更改
+@csrf_exempt
+def change_password(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = 'Wrong Method'
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        user_id = post_content['id']
+        password = post_content['password']
+        user = User.objects.get(id=user_id)
+        user.password = make_password(password)
+        user.save()
+    except User.DoesNotExist:
+        dic['status'] = 'Failed'
+        dic['message'] = 'Wrong id'
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = 'Success'
+    return HttpResponse(json.dumps(dic))
+
+    # dic = {'message': "hello"}
+    # return HttpResponse(json.dumps(dic))
