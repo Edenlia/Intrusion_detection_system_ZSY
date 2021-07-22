@@ -48,6 +48,11 @@ from .models import User, Camera
 #     return HttpResponse(json.dumps(dic))
 
 
+
+# def test(request):
+#     return HttpResponse("result")
+
+
 # id permission username password
 # 登录验证内容 输入合理 存在账号  密码正确
 # 返回id
