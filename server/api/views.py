@@ -14,7 +14,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .models import User
 
 
-
 # def test(request):
 #     return HttpResponse("result")
 
@@ -115,4 +114,37 @@ def change_password(request):
     return HttpResponse(json.dumps(dic))
 
     # dic = {'message': "hello"}
-    # return HttpResponse(json.dumps(dic))
+    # return HttpResponse(json.dumps(dic))s
+
+
+# 添加管理员账号
+# post  id
+@csrf_exempt
+def add_admin(request):
+    dic = {}
+    if request.method == 'GET':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        user_id = post_content['id']
+        user = User.objects.get(id=user_id)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except User.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = 'Not Exist user'
+        return HttpResponse(json.dumps(dic))
+    # 查看用户权限
+    if user.permission == '1':
+        dic['status'] = 'Failed'
+        dic['message'] = 'No user'
+        return HttpResponse(json.dumps(dic))
+    else:
+        user.permission = 1
+        user.save()
+        dic['status'] = 'Successes'
+        return HttpResponse(json.dumps(dic))
