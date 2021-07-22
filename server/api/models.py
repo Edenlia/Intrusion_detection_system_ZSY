@@ -7,17 +7,20 @@ from io import BytesIO
 from django.utils import timezone
 
 
+# user id permission username password
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     permission = models.IntegerField(default=0)  # user is 0 ,admin=1
     username = models.CharField(max_length=30)
     password = models.TextField()
+
     # last_login = models.TimeField(default=timezone.now())
 
     def __str__(self):
         return self.username
 
 
+# log in
 class Log(models.Model):
     id = models.BigAutoField(primary_key=True)
     checked = models.BooleanField(default=0)
