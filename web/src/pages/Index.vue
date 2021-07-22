@@ -1,9 +1,13 @@
 <template>
   <q-page class="flex flex-center">
     <img
-      src="http://127.0.0.1:8000/video/"
+      src="http://127.0.0.1:8000/video/test1"
+    >
+    <img
+      src="http://127.0.0.1:8000/video/test2"
     >
     <q-btn @click="request_video" label="hhh"></q-btn>
+
   </q-page>
 </template>
 
@@ -15,7 +19,8 @@ export default{
   name: 'PageIndex',
   data(){
     return{
-      img: ""
+      img: "",
+
     }
   },
   methods:{

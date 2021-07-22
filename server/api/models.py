@@ -20,28 +20,30 @@ class User(models.Model):
         return self.username
 
 
-# log in
-class Log(models.Model):
+class Camera(models.Model):
     id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=80)
+    url = models.CharField(max_length=100)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='user'
+    )
+    description = models.TextField()
+
+
+class Case(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    detect_camera = models.ForeignKey(
+        Camera, on_delete=models.CASCADE, related_name='camera'
+    )
     checked = models.BooleanField(default=0)
-    checked_admin = models.IntegerField(default=-1)
+    case_type = models.IntegerField()
+    case_description = models.TextField()
+    level = models.IntegerField()
     date_time = models.DateField(default=timezone.now())
     img = models.ImageField(upload_to='img')
 
 
-class Camera(models.Model):
+class Car_Record(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=80)
-    description = models.TextField()
-
-
-class User_Camera_Relation(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user_id = models.ForeignKey(
-        User, on_delete=models.DO_NOTHING, related_name='user'
-    )
-    camera_id = models.ForeignKey(
-        Camera, on_delete=models.DO_NOTHING, related_name='camera'
-    )
-
+    car_brand = models.TextField()
 # Create your models here.

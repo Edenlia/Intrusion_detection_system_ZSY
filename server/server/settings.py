@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import pymysql
 
+
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -81,12 +82,14 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
         'NAME': 'intrusion_detection_system',  # 数据库名
         'USER': 'root',  # 账号
-        'PASSWORD': '123456',  # 密码
+        'PASSWORD': '123',  # 密码
         'HOST': '127.0.0.1',  # HOST
         'POST': 3306,  # 端口
 
