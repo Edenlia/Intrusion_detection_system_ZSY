@@ -5,11 +5,18 @@ from django.http import HttpResponse
 import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views import View
+
 import datetime
 from django.core.serializers.json import DjangoJSONEncoder
 
 # 导入model中的User
 from .models import User
+
+
+
+# def test(request):
+#     return HttpResponse("result")
 
 
 # id permission username password
@@ -53,6 +60,8 @@ def login(request):
 # method POST
 # id permission username password
 # 注册逻辑 存在输入 用户不存在进行注册
+# 要求：
+# 重复用户检测
 @csrf_exempt
 def register(request):
     dic = {}
