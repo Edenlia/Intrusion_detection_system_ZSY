@@ -14,8 +14,8 @@ from django.views.decorators import gzip
 
 
 class VideoCamera(object):
-    def __init__(self):
-        self.video = cv2.VideoCapture(0)
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
         (self.grabbed, self.frame) = self.video.read()
         threading.Thread(target=self.update, args=()).start()
 
@@ -40,13 +40,23 @@ def gen(camera):
 
 
 @gzip.gzip_page
-def index(request):
+@csrf_exempt
+def test1(request):
     try:
-        cam = VideoCamera()
+        cam = VideoCamera(0)
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         pass
 
+
+@gzip.gzip_page
+@csrf_exempt
+def test2(request):
+    try:
+        cam = VideoCamera('http://admin:12345@192.168.43.1:8081/')
+        return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+    except:  # This is bad! replace it with proper handling
+        pass
 
 
 
