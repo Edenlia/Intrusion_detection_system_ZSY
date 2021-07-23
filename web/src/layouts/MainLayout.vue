@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header elevated class="bg-black">
       <q-toolbar>
         <q-btn
           flat
@@ -9,6 +9,7 @@
           icon="menu"
           aria-label="Menu"
           @click="toggleLeftDrawer"
+          v-if="this.$route.path !== '/' && this.$route.path !== '/register'"
         />
 
         <q-toolbar-title>
@@ -23,21 +24,11 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      class="bg-grey-1"
+      class="bg-black"
+      v-if="this.$route.path !== '/' && this.$route.path !== '/register'">
     >
       <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
-          Essential Links
-        </q-item-label>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
       </q-list>
     </q-drawer>
 
@@ -48,7 +39,7 @@
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
+// import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
   {
@@ -100,9 +91,6 @@ import { defineComponent, ref } from 'vue'
 export default defineComponent({
   name: 'MainLayout',
 
-  components: {
-    EssentialLink
-  },
 
   setup () {
     const leftDrawerOpen = ref(false)
