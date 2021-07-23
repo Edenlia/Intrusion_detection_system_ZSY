@@ -285,6 +285,32 @@ def query_user(request):
     return HttpResponse(json.dumps(dic))
 
 
+#添加摄像头
+#name url 外键id
+@csrf_exempt
+def add_camera(request):
+    dic={}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        xx = post_content['xx']
+        user = User.objects.get(xx=xx)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except User.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Username"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
+
+
 # 添加管理员账号
 # post  id
 @csrf_exempt
