@@ -209,7 +209,7 @@ def change_password(request):
     return HttpResponse(json.dumps(dic))
 
     # dic = {'message': "hello"}
-    # return HttpResponse(json.dumps(dic))s
+    # return HttpResponse(json.dumps(dic))
 
 
 # 查询所有的用户
