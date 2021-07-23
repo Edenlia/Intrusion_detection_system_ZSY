@@ -246,6 +246,40 @@ def query_all(request):
     return HttpResponse(json.dumps(dic))
 
 
+# 查询所有的用户
+@csrf_exempt
+def query_all(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        permission = post_content['permission']
+        # user = User.objects.filter(permission=permission)
+        users = User.objects.filter(permission=permission)
+        array = []
+        for user in users:
+            dics = {'id': user.id, "username": user.username}
+            array.append(dics)
+        # print(array)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except User.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Username"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    dic['user_list'] = array
+    # dic['id'] = list(user.values('id'))
+    # dic['username'] = list(user.values('username'))
+    return HttpResponse(json.dumps(dic))
+
+
 # 查询独立用户
 # 查询一个用户， 并返回用户所用的所有摄像头
 # 根据id 查询
@@ -282,6 +316,33 @@ def query_user(request):
         dic['message'] = "Wrong Username"
         return HttpResponse(json.dumps(dic))
 
+    return HttpResponse(json.dumps(dic))
+
+
+
+#添加摄像头
+#name url 外键id
+@csrf_exempt
+def add_camera(request):
+    dic={}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        xx = post_content['xx']
+        user = User.objects.get(xx=xx)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except User.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Username"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
     return HttpResponse(json.dumps(dic))
 
 
