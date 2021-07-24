@@ -14,4 +14,6 @@ urlpatterns = [
     path('camera/add_camera/',views.add_camera,name='add_camera'),
     path('camera/delete_camera/',views.delete_camera,name='delete_camera'),
     path('camera/change_url/',views.change_url,name='change_url'),
+    path('camera/change_name/',views.change_name,name='change_name'),
+    path('camera/query_camera/',views.query_camera,name='query_camera'),
 ]

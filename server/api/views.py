@@ -447,8 +447,13 @@ def change_url(request):
         name = post_content['name']
         camera = Camera.objects.get(id=camera_id)
         if name == camera.name:
-            camera.url = url
-            camera.save()
+            if url == camera.url:
+                dic['status'] = 'Failed'
+                dic['message'] = 'Same url'
+                return HttpResponse(json.dumps(dic))
+            else:
+                camera.url = url
+                camera.save()
         else:
             dic['status'] = 'Failed'
             dic['message'] = 'Wrong Name'
@@ -464,30 +469,74 @@ def change_url(request):
     dic['status'] = "Success"
     return HttpResponse(json.dumps(dic))
 
-# #函数模板
-# @csrf_exempt
-# def xxx(request):
-#     dic={}
-#     if request.method != 'POST':
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Method"
-#         return HttpResponse(json.dumps(dic))
-#     try:
-#         post_content = json.loads(request.body)
-#         xx = post_content['xx']
-#         user = User.objects.get(xx=xx)
-#     except(KeyError, json.decoder.JSONDecodeError):
-#         dic['status'] = "Failed"
-#         dic['message'] = "No Input"
-#         return HttpResponse(json.dumps(dic))
-#     except User.DoesNotExist:
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Username"
-#         return HttpResponse(json.dumps(dic))
-#
-#     dic['status'] = "Success"
-#     return HttpResponse(json.dumps(dic))
 
+# 改变摄像头名字
+# 传入id name url
+@csrf_exempt
+def change_name(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        camera_id = post_content['id']
+        name = post_content['name']
+        url = post_content['url']
+        camera = Camera.objects.get(id=camera_id)
+        # 验证url
+        if url == camera.url:
+            if name == camera.name:
+                dic['status'] = 'Field'
+                dic['message'] = 'Same Name'
+            else:
+                camera.name = name
+                camera.save()
+        else:
+            dic['status'] = 'Failed'
+            dic['message'] = 'Wrong Url'
+
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Camera.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Id"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
+
+
+# 查询摄像头
+# 用户查询自己的摄像头
+# id
+@csrf_exempt
+def query_camera(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        camera_id = post_content['id']
+        camera = Camera.objects.get(id=camera_id)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Camera.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Id"
+        return HttpResponse(json.dumps(dic))
+    dic['status'] = "Success"
+    dic['id']=camera.id
+    dic['name']=camera.name
+    dic['url']=camera.url
+    return HttpResponse(json.dumps(dic))
 
 
 # 添加管理员账号
