@@ -192,22 +192,27 @@ def change_password(request):
     try:
         post_content = json.loads(request.body)
         user_id = post_content['id']
+        username = post_content['username']
         new_password = post_content['password']
         user = User.objects.get(id=user_id)
-        user.password = make_password(new_password)
-        user.save()
+        if username == user.username:
+            user.password = make_password(new_password)
+            user.save()
+            dic['status'] = 'Success'
+        else:
+            dic['status'] = 'Failed'
+            dic['message'] = "Wrong Username"
+        # 重复密码会报错(不管）
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
         return HttpResponse(json.dumps(dic))
     except User.DoesNotExist:
         dic['status'] = 'Failed'
-        dic['message'] = 'Wrong id'
+        dic['message'] = 'Wrong Id'
         return HttpResponse(json.dumps(dic))
 
-    dic['status'] = 'Success'
     return HttpResponse(json.dumps(dic))
-
     # dic = {'message': "hello"}
     # return HttpResponse(json.dumps(dic))s
 
@@ -319,12 +324,11 @@ def query_user(request):
     return HttpResponse(json.dumps(dic))
 
 
-
-#添加摄像头
-#name url 外键id
+# 添加摄像头
+# name url 外键id
 @csrf_exempt
 def add_camera(request):
-    dic={}
+    dic = {}
     if request.method != 'POST':
         dic['status'] = "Failed"
         dic['message'] = "Wrong Method"
