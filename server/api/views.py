@@ -13,14 +13,25 @@ from django.core.serializers.json import DjangoJSONEncoder
 # 导入model中的User
 from .models import User, Camera
 
-
 # 代码编码规则
 # 下划线命名法
 # 函数名 动作+对象，如更改密码 change——password
 
+import base64
+import cv2
 
-# def test(request):
-#     return HttpResponse("result")
+
+@csrf_exempt
+def test(request):
+    img_im = cv2.imread("C://Users//admin//Desktop//202002122048522375731938478.jpg")
+    aa = base64.b64encode(cv2.imencode('.jpg', img_im)[1]).decode()
+    # aa = base64.b64encode(open("C://Users//admin//Desktop//202002122048522375731938478.jpg", 'rb').read())
+    print(aa)  # 17292
+    dic = {}
+    dic['status'] = 'Success'
+    # dic['message']='img'
+    dic['img'] = 'data:image/jpg;base64,'+aa
+    return HttpResponse(json.dumps(dic))
 
 
 # #函数模板
@@ -296,6 +307,9 @@ def query_user(request):
     return HttpResponse(json.dumps(dic))
 
 
+
+
+
 # 添加摄像头
 # name url 外键id
 @csrf_exempt
@@ -533,9 +547,9 @@ def query_camera(request):
         dic['message'] = "Wrong Id"
         return HttpResponse(json.dumps(dic))
     dic['status'] = "Success"
-    dic['id']=camera.id
-    dic['name']=camera.name
-    dic['url']=camera.url
+    dic['id'] = camera.id
+    dic['name'] = camera.name
+    dic['url'] = camera.url
     return HttpResponse(json.dumps(dic))
 
 
