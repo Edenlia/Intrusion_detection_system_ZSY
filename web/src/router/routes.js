@@ -9,9 +9,9 @@ const routes = [
       { path: 'home', component: () => import('pages/Home.vue') },
       { path: 'profile', component: () => import('pages/Profile.vue') },
       { path: 'camera', component: () => import('pages/Camera.vue') },
-      { path: 'camera_detail', component: () => import('pages/CameraDetail.vue') },
+      { path: 'camera_detail/:id', component: () => import('pages/CameraDetail.vue'), props: true },
       { path: 'case', component: () => import('pages/Case.vue') },
-      { path: 'case_detail', component: () => import('pages/CaseDetail.vue') },
+      { path: 'case_detail/:id', component: () => import('pages/CaseDetail.vue'), props: true },
       { path: 'analytics', component: () => import('pages/Analytics.vue') },
     ]
   },
