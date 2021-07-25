@@ -32,6 +32,9 @@
 </template>
 
 <script>
+import {api} from "boot/axios";
+import {Notify} from "quasar";
+
 export default {
   name: "Register",
   data(){
@@ -43,7 +46,55 @@ export default {
   },
   methods:{
     Register(){
-
+      if(this.password !== this.confirm){
+        Notify.create(
+          {
+            type: 'negative',
+            message: '密码与确认密码不同'
+          }
+        )
+        return
+      }
+      let _this = this
+      api.post("http://192.168.43.28:8000/api/log/register/", {
+        username: this.username,
+        password: this.password
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          Notify.create(
+            {
+              type: 'positive',
+              message: '注册成功'
+            }
+          )
+          _this.$router.push("/")
+        }else{
+          if(res.message === "User exist"){
+            Notify.create(
+              {
+                type: 'negative',
+                message: '用户名已存在'
+              }
+            )
+          }else{
+            Notify.create(
+              {
+                type: 'negative',
+                message: '未知错误'
+              }
+            )
+          }
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
   }
 }

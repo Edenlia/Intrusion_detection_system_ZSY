@@ -28,6 +28,9 @@
 </template>
 
 <script>
+import {api} from "boot/axios";
+import {Notify} from "quasar";
+
 export default {
   name: "Login",
   data(){
@@ -38,7 +41,32 @@ export default {
   },
   methods:{
     Login(){
-
+      let _this = this
+      api.post("http://192.168.43.28:8000/api/log/login/", {
+        username: this.username,
+        password: this.password
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          sessionStorage.setItem('user_id', res.id)
+          _this.$router.push("/home")
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '用户名或密码错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
   }
 }
