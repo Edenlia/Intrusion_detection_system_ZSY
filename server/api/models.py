@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from PIL import Image
 from django.core.files import File
 from datetime import datetime
@@ -23,6 +22,7 @@ class User(models.Model):
 class Camera(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80)
+    tap = models.IntegerField()  # 0 1.车牌 2.人脸 3.移动物体 4.
     url = models.CharField(max_length=100)
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='user'
@@ -36,7 +36,7 @@ class Case(models.Model):
         Camera, on_delete=models.CASCADE, related_name='camera'
     )
     checked = models.BooleanField(default=0)
-    case_type = models.IntegerField()
+    case_type = models.IntegerField()  # 什么样的
     case_description = models.TextField()
     level = models.IntegerField()
     date_time = models.DateField(default=timezone.now())
