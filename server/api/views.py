@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 import json
 import datetime
-
+from django.utils import timezone
 # 导入model中的User
 from .models import User, Camera, Case
 
@@ -643,6 +643,105 @@ def query_case(request):
         dic['message'] = "Wrong Id"
         return HttpResponse(json.dumps(dic))
 
+    return HttpResponse(json.dumps(dic, cls=DateEncoder))
+
+
+# @csrf_exempt
+# def xx(request):
+#     dic = {}
+#     if request.method != 'POST':
+#         dic['status'] = "Failed"
+#         dic['message'] = "Wrong Method"
+#         return HttpResponse(json.dumps(dic))
+#     try:
+#         now = datetime.datetime.now()
+#         start = now - datetime.timedelta(days=30)
+#         cases = Case.objects.filter(date_time__gte=start, case_type=2)  # 筛选一个月内的未知人员入侵
+#         array = []
+#         for case in cases:
+#             dicx = {'id': case.id, 'checked': case.checked, 'case_description': case.case_description,
+#                     'level': case.level, 'date_time': case.date_time, 'img': case.img}
+#             array.append(dicx)
+#     except(KeyError, json.decoder.JSONDecodeError):
+#         dic['status'] = "Failed"
+#         dic['message'] = "No Input"
+#         return HttpResponse(json.dumps(dic))
+#     except Case.DoesNotExist:
+#         dic['status'] = "Failed"
+#         dic['message'] = "Empty Case"
+#         return HttpResponse(json.dumps(dic))
+#
+#     dic['status'] = "Success"
+#     dic['case_list'] = array
+#     return HttpResponse(json.dumps(dic, cls=DateEncoder))
+
+# 统计一个月早中晚入侵人数
+# 查询数据库中一个月的内容
+@csrf_exempt
+def count_human_case(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=30)
+        # --gt 大于 --gte大于等于 datetime 递增
+        cases = Case.objects.filter( date_time__gte=start,case_type=2).order_by('date_time')  # 筛选一个月内的未知人员入侵
+        # 再次筛选出早中晚,时间段为4-11 11-18 18-4
+        #
+        array = []
+        for case in cases:
+            dicx = {'id': case.id, 'checked': case.checked, 'case_description': case.case_description,
+                    'level': case.level, 'date_time': case.date_time, 'img': case.img}
+            array.append(dicx)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty Case"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    dic['case_list'] = array
+    return HttpResponse(json.dumps(dic, cls=DateEncoder))
+
+
+# 统计一周内每天新注册用户
+# 查询数据库中一个月的内容
+@csrf_exempt
+def count_user_register(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=7)
+        # --gt 大于 --gte大于等于 datetime 递增
+        users= User.objects.filter(date_time__gte=start,date_time__day=26).order_by('date_time')  # 筛选一个月内的未知人员入侵
+        # users = User.objects.filter(date_time__day=26)
+        # 再次筛选出早中晚,时间段为4-11 11-18 18-4
+        #
+        array = []
+        for user in users:
+            dicx = {'id': user.id, 'permission':user.permission,'username':user.username,'date_time':user.date_time}
+            array.append(dicx)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except User.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty User"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    dic['case_list'] = array
     return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
 
