@@ -1,7 +1,6 @@
 from django.contrib.auth.hashers import make_password, check_password
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views import View
 
 import json
 import datetime
@@ -34,10 +33,8 @@ def test(request):
     aa = base64.b64encode(cv2.imencode('.jpg', img_im)[1]).decode()
     # aa = base64.b64encode(open("C://Users//admin//Desktop//202002122048522375731938478.jpg", 'rb').read())
     print(aa)  # 17292
-    dic = {}
-    dic['status'] = 'Success'
+    dic = {'status': 'Success', 'img': 'data:image/jpg;base64,' + aa}
     # dic['message']='img'
-    dic['img'] = 'data:image/jpg;base64,' + aa
     return HttpResponse(json.dumps(dic))
 
 
@@ -251,7 +248,6 @@ def query_all(request):
     try:
         post_content = json.loads(request.body)
         permission = post_content['permission']
-        # user = User.objects.filter(permission=permission)
         users = User.objects.filter(permission=permission)
         array = []
         for user in users:
@@ -380,73 +376,6 @@ def delete_camera(request):
     dic['status'] = 'Success'
     return HttpResponse(json.dumps(dic))
 
-    # dic = {}
-    # if request.method != 'POST':
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "Wrong Method"
-    #     return HttpResponse(json.dumps(dic))
-    # try:
-    #     post_content = json.loads(request.body)
-    #     camera_id = post_content['id']
-    #     name = post_content['name']
-    #     user_id = post_content['owner_id']
-    #
-    #     camera = Camera.objects.get(id=camera_id)
-    #     user = User.objects.get(id=user_id)
-    #
-    #     if name == camera.name:
-    #         # 名字相同
-    #         if user == camera.owner:
-    #             # 外键id相同
-    #             camera.delete()
-    #         else:
-    #             dic['status'] = 'Failed'
-    #             dic['message'] = 'Wrong Owner'
-    #             # 相同的错误信息(待解决)
-    #             return HttpResponse(json.dumps(dic))
-    #     else:
-    #         dic['status'] = 'Failed'
-    #         dic['message'] = 'Wrong Name'
-    #         return HttpResponse(json.dumps(dic))
-    # except(KeyError, json.decoder.JSONDecodeError):
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "No Input"
-    #     return HttpResponse(json.dumps(dic))
-    # except Camera.DoesNotExist:
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "Wrong Id"
-    #     return HttpResponse(json.dumps(dic))
-    # except User.DoesNotExist:
-    #     dic['status'] = 'Failed'
-    #     dic['message'] = 'Wrong Owner_id'
-    #     return HttpResponse(json.dumps(dic))
-    #
-    # dic['status'] = 'Success'
-    # return HttpResponse(json.dumps(dic))
-
-    # dic = {}
-    # if request.method != 'POST':
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "Wrong Method"
-    #     return HttpResponse(json.dumps(dic))
-    # try:
-    #     post_content = json.loads(request.body)
-    #     camera_id = post_content['id']
-    #
-    #     camera = Camera.objects.get(id=camera_id)
-    #     camera.delete()
-    # except(KeyError, json.decoder.JSONDecodeError):
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "No Input"
-    #     return HttpResponse(json.dumps(dic))
-    # except Camera.DoesNotExist:
-    #     dic['status'] = "Failed"
-    #     dic['message'] = "Wrong Id"
-    #     return HttpResponse(json.dumps(dic))
-    #
-    # dic['status'] = "Success"
-    # return HttpResponse(json.dumps(dic))
-
 
 # 改变摄像头url
 # 传入id name 改变url
@@ -560,29 +489,28 @@ def query_camera(request):
 # 增加异常信息
 # opencv生成
 # 入侵情况 tap
-@csrf_exempt
-def add_case(request):
-    dic = {}
-    if request.method != 'POST':
-        dic['status'] = "Failed"
-        dic['message'] = "Wrong Method"
-        return HttpResponse(json.dumps(dic))
-    try:
-        post_content = json.loads(request.body)
-        xx = post_content['xx']
-        user = User.objects.get(xx=xx)
-    except(KeyError, json.decoder.JSONDecodeError):
-        dic['status'] = "Failed"
-        dic['message'] = "No Input"
-        return HttpResponse(json.dumps(dic))
-    except User.DoesNotExist:
-        dic['status'] = "Failed"
-        dic['message'] = "Wrong Username"
-        return HttpResponse(json.dumps(dic))
-
-    dic['status'] = "Success"
-    return HttpResponse(json.dumps(dic))
-
+# @csrf_exempt
+# def add_case(request):
+#     dic = {}
+#     if request.method != 'POST':
+#         dic['status'] = "Failed"
+#         dic['message'] = "Wrong Method"
+#         return HttpResponse(json.dumps(dic))
+#     try:
+#         post_content = json.loads(request.body)
+#         xx = post_content['xx']
+#         user = User.objects.get(xx=xx)
+#     except(KeyError, json.decoder.JSONDecodeError):
+#         dic['status'] = "Failed"
+#         dic['message'] = "No Input"
+#         return HttpResponse(json.dumps(dic))
+#     except User.DoesNotExist:
+#         dic['status'] = "Failed"
+#         dic['message'] = "Wrong Username"
+#         return HttpResponse(json.dumps(dic))
+#
+#     dic['status'] = "Success"
+#     return HttpResponse(json.dumps(dic))
 
 # 删除异常信息
 @csrf_exempt
@@ -682,7 +610,6 @@ def query_all_case(request):
 
     dic['status'] = "Success"
     dic['case_list'] = sorted(array, key=lambda i: (i['date_time']))
-    # dic['case_list'] = dict(sorted(array.items(), key=lambda x: x[7], reverse=False))
     return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
 
@@ -706,8 +633,7 @@ def query_case(request):
         dic['case_type'] = case.case_type
         dic['level'] = case.level
         dic['date_time'] = case.date_time
-        aa = case.img
-        dic['img'] = 'data:image/jpg;base64,' + aa
+        dic['img'] = case.img
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
