@@ -107,3 +107,5 @@ def change_password(request):
 
     # dic = {'message': "hello"}
     # return HttpResponse(json.dumps(dic))
+
+
