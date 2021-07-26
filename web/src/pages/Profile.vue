@@ -27,18 +27,77 @@
 </template>
 
 <script>
+import {Notify} from "quasar";
+import {api} from "boot/axios";
+
 export default {
   name: "Profile",
   data(){
     return{
       username: "",
       password: "",
-      confirm: ""
+      confirm: "",
+      user_id: ""
     }
+  },
+  created(){
+    if(sessionStorage.getItem('user_id') === null){
+      this.$router.push('/')
+      return
+    }
+    this.user_id = sessionStorage.getItem('user_id')
   },
   methods:{
     change_password(){
-
+      if(this.password !== this.confirm){
+        Notify.create(
+          {
+            type: 'negative',
+            message: '密码与确认密码不同'
+          }
+        )
+        return
+      }
+      let _this = this
+      api.post("http://192.168.43.28:8000/api/log/change_password/", {
+        id: this.user_id,
+        username: this.username,
+        password: this.password
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          Notify.create(
+            {
+              type: 'positive',
+              message: '修改成功'
+            }
+          )
+        }else{
+          if(res.message === "Wrong Username"){
+            Notify.create(
+              {
+                type: 'negative',
+                message: '用户名错误'
+              }
+            )
+          }else{
+            Notify.create(
+              {
+                type: 'negative',
+                message: '未知错误'
+              }
+            )
+          }
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
   }
 }

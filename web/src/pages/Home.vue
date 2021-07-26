@@ -5,13 +5,13 @@
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头1</div>
           <div class="col">
-            <img :src="camera_urls[0]">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[0])">
           </div>
         </div>
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头2</div>
           <div class="col">
-            <img :src="camera_urls[1]">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[1])">
           </div>
         </div>
       </div>
@@ -19,13 +19,13 @@
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头3</div>
           <div class="col">
-            <img :src="camera_urls[2]">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[2])">
           </div>
         </div>
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头4</div>
           <div class="col">
-            <img :src="camera_urls[3]">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[3])">
           </div>
         </div>
       </div>
@@ -38,7 +38,17 @@ export default {
   name: "Home",
   data(){
     return{
+      img_error_url: 'img_error.jpg',
       camera_urls: ['', '', '', '']
+    }
+  },
+  methods:{
+    img_exist(url){
+      if(url === ''){
+        return require('assets/img/img_error.jpg')
+      }else{
+        return require(url)
+      }
     }
   }
 }
