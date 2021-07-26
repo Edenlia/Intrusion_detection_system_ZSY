@@ -12,6 +12,7 @@ class User(models.Model):
     permission = models.IntegerField(default=0)  # user is 0 ,admin=1
     username = models.CharField(max_length=30)
     password = models.TextField()
+    #注册时间,默认
 
     # last_login = models.TimeField(default=timezone.now())
 
@@ -33,8 +34,8 @@ class Camera(models.Model):
 class Case(models.Model):
     id = models.BigAutoField(primary_key=True)
     checked = models.BooleanField(default=0)
-    case_type = models.IntegerField()  # 什么样的   0 1  2 3
-    case_description = models.TextField()
+    case_type = models.IntegerField()  # 什么样的  0 1  2 3
+    case_description = models.TextField()#描述信息
     level = models.IntegerField()
     date_time = models.DateTimeField(default=timezone.now())
     img = models.TextField()  # base64图片文件,包含前缀
