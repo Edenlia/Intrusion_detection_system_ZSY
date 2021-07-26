@@ -1,13 +1,7 @@
-from django.contrib.auth.hashers import make_password, check_password
-from django.shortcuts import render
 from django.http import HttpResponse, StreamingHttpResponse
-from django.template import loader
 
-import json
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-import datetime
-from django.core.serializers.json import DjangoJSONEncoder
+
 import cv2
 import threading
 from django.views.decorators import gzip
@@ -43,7 +37,7 @@ def gen(camera):
 @csrf_exempt
 def test1(request):
     try:
-        cam = VideoCamera("rtsp://localhost/test")
+        cam = VideoCamera(0)
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         pass
