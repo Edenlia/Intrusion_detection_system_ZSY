@@ -43,7 +43,7 @@ def gen(camera):
 @csrf_exempt
 def test1(request):
     try:
-        cam = VideoCamera("rtsp://localhost/test")
+        cam = VideoCamera(0)
         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
     except:  # This is bad! replace it with proper handling
         pass
