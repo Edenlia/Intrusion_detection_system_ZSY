@@ -22,7 +22,7 @@ class User(models.Model):
 class Camera(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80)
-    tap = models.IntegerField()  # 0.正常情况（一般不会出现，占位用） 1.指定区域有人入侵 2.识别入侵人物脸部情况 3.指定区域车辆进入 4.识别车牌情况
+    type = models.IntegerField()  # 0.正常情况（一般不会出现，占位用） 1.指定区域有人入侵 2.识别入侵人物脸部情况 3.指定区域车辆进入 4.识别车牌情况
     url = models.CharField(max_length=100)
     description = models.TextField()
     owner = models.ForeignKey(

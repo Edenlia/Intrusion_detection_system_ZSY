@@ -4,7 +4,7 @@
       <q-table
         class="my-sticky-header-table"
         title="未查看异常"
-        :rows=rows
+        :rows=checked_cases
         :columns=columns
         row-key="id"
         flat
@@ -17,7 +17,7 @@
       <q-table
         class="my-sticky-header-table"
         title="已查看异常"
-        :rows=rows
+        :rows=unchecked_cases
         :columns=columns
         row-key="id"
         flat
@@ -29,8 +29,19 @@
 </template>
 
 <script>
+import axios from "axios";
+import {Notify} from "quasar";
+
 export default {
   name: "Case",
+  created(){
+    if(sessionStorage.getItem('user_id') === null){
+      this.$router.push('/')
+      return
+    }
+    this.user_id = sessionStorage.getItem('user_id')
+    this.get_all_query()
+  },
   data(){
     return{
       columns: [
@@ -45,33 +56,55 @@ export default {
         { name: 'detected_camera', align: 'center', label: '检测到异常的摄像头', field: 'camera_name'},
         { name: 'case_type', label: '异常类型', field: 'case_type', sortable: true },
         { name: 'level', label: '异常等级', field: 'level' },
-        { name: 'data_time', label: '发生时间', field: 'data_time' },
-        { name: 'operation', label: '操作', field: 'operation' }
+        { name: 'data_time', label: '发生时间', field: 'date_time' },
       ],
-      rows: [
-        {
-          id: '1',
-          camera_name: 'hhh',
-          case_type: 3,
-          level: 5,
-          data_time: 'hhhhhh',
-          operation: 87
-        },
-        {
-          id: '2',
-          camera_name: 'hhh',
-          case_type: 3,
-          level: 5,
-          data_time: 'hhhhhh',
-          operation: 87
-        },
-      ]
+      unchecked_cases:[],
+      checked_cases:[]
     }
   },
   methods:{
     go_case_detail(evt, row){
       this.$router.push('/case_detail/' + row.id)
+    },
+    get_all_query(){
+      let _this = this
+      axios.post("http://192.168.43.28:8000/api/case/query_all_case/", {
+        id : this.user_id
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          let case_list = res.case_list
+          for(let i = 0; i < case_list.length; i++){
+            let row = {}
+            row.id = case_list[i].id
+            row.camera_name = case_list[i].detect_camera
+            row.checked = case_list[i].checked
+            row.case_type = case_list[i].case_type
+            row.case_description = case_list[i].case_description
+            row.level = case_list[i].level
+            row.date_time = case_list[i].date_time
+            if(row.checked) _this.checked_cases.push(row)
+            else _this.unchecked_cases.push(row)
+          }
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
+
   }
 }
 </script>
