@@ -1,11 +1,32 @@
 <template>
-  <v-chart class="chart" :option="option" />
+  <q-page class="flex" style="background: #f0f2f5">
+    <div class=" full-width column bg-white q-ma-md" style="height: 650px">
+      <div class="col-6 row q-py-md">
+        <div class="col-6 q-px-md column">
+          <v-chart class="chart" :option="option_pie_user"></v-chart>
+        </div>
+        <div class="col-6 q-px-md column">
+
+        </div>
+      </div>
+      <div class="col-6 row q-py-md">
+        <div class="col-6 q-px-md column">
+
+        </div>
+        <div class="col-6 q-px-md column">
+
+        </div>
+      </div>
+    </div>
+  </q-page>
+
 </template>
 
 <script>
+import { ref } from 'vue' ;
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart } from "echarts/charts";
+import { PieChart, LineChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
@@ -16,12 +37,18 @@ import VChart, { THEME_KEY } from "vue-echarts";
 use([
   CanvasRenderer,
   PieChart,
+  LineChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent
 ]);
 
 export default {
+  setup(){
+    return{
+      slide: ref('style')
+    }
+  },
   name: "HelloWorld",
   components: {
     VChart
@@ -31,9 +58,9 @@ export default {
   },
   data() {
     return {
-      option: {
+      option_pie_user: {
         title: {
-          text: "Traffic Sources",
+          text: "Sources",
           left: "center"
         },
         tooltip: {
@@ -73,7 +100,10 @@ export default {
             }
           }
         ]
-      }
+      },
+      option_pie_admin:{},
+      option_bar_user:{},
+      option_bar_admin:{}
     };
   }
 };
@@ -82,5 +112,6 @@ export default {
 <style scoped>
 .chart {
   height: 400px;
+  width: 600px;
 }
 </style>
