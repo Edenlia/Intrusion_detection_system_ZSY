@@ -21,7 +21,7 @@ urlpatterns = [
     path('case/delete_case/',views.delete_case,name='delete_case'),
     path('case/change_checked/',views.change_checked,name='change_checked'),
     path('case/query_all_case/', views.query_all_case, name='query_all_case'),
-    path('case/query_case',views.query_case,name='query_case'),
+    path('case/query_case/',views.query_case,name='query_case'),
     path('case/add_case/',views.add_case,name='add_case'),
 
 ]

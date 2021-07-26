@@ -68,7 +68,7 @@ export default {
     },
     get_all_query(){
       let _this = this
-      axios.post("http://192.168.43.28:8000/api/case/query_all_case/", {
+      axios.post("http://127.0.0.1:8000/api/case/query_all_case/", {
         id : this.user_id
       }).then(function(response){
         console.log(response)

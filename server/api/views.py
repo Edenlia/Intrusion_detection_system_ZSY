@@ -639,7 +639,6 @@ def change_checked(request):
     return HttpResponse(json.dumps(dic))
 
 
-
 # 查询摄像头下面的所有的异常信息
 # id
 @csrf_exempt
@@ -702,7 +701,7 @@ def query_case(request):
         return HttpResponse(json.dumps(dic))
 
     dic['status'] = "Success"
-    dic['img']='data:image/jpg;base64,' + aa
+    dic['img']=aa
     return HttpResponse(json.dumps(dic))
 
 
