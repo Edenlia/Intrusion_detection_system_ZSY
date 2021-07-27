@@ -23,14 +23,8 @@ urlpatterns = [
     path('case/query_all_case/', views.query_all_case, name='query_all_case'),
     path('case/query_case/', views.query_case, name='query_case'),
 
-    path('count/count_human_case/', views.count_human_all, name='count_human_case'),  # 一个月内早中晚入侵人员统计
-    path('count/count_car_case', views.count_car_all),
-    path('count/count_user_register/',views.count_user_register),
-    path('count/count_human_user/',views.count_human_user),
-    # path('count/count_human_age/',views.count_human_age),
-    # path('count/count_human_gender/',views.count_human_gender),
-    # path('count/count_week_case/',views.count_week_case),
-    path('count/count_week_camera/',views.count_week_camera),
 
+    path('count/count_all/',views.count_all),
+    path('count/count_user/',views.count_user),
 
 ]
