@@ -24,6 +24,9 @@ urlpatterns = [
     path('case/query_case/', views.query_case, name='query_case'),
 
     path('count/count_human_case/', views.count_human_case, name='count_human_case'),  # 一个月内早中晚入侵人员统计
+    path('count/count_car_case',views.count_car_case),
     path('count/count_user_register/',views.count_user_register),
+    path('count/count_human_age/',views.count_human_age),
+    path('count/count_human_gender/',views.count_human_gender),
 
 ]

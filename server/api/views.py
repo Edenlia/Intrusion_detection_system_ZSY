@@ -35,6 +35,8 @@ def test(request):
     print(aa)  # 17292
     dic = {'status': 'Success', 'img': 'data:image/jpg;base64,' + aa}
     # dic['message']='img'
+
+    'male 18-24'
     return HttpResponse(json.dumps(dic))
 
 
@@ -646,35 +648,6 @@ def query_case(request):
     return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
 
-# @csrf_exempt
-# def xx(request):
-#     dic = {}
-#     if request.method != 'POST':
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Method"
-#         return HttpResponse(json.dumps(dic))
-#     try:
-#         now = datetime.datetime.now()
-#         start = now - datetime.timedelta(days=30)
-#         cases = Case.objects.filter(date_time__gte=start, case_type=2)  # 筛选一个月内的未知人员入侵
-#         array = []
-#         for case in cases:
-#             dicx = {'id': case.id, 'checked': case.checked, 'case_description': case.case_description,
-#                     'level': case.level, 'date_time': case.date_time, 'img': case.img}
-#             array.append(dicx)
-#     except(KeyError, json.decoder.JSONDecodeError):
-#         dic['status'] = "Failed"
-#         dic['message'] = "No Input"
-#         return HttpResponse(json.dumps(dic))
-#     except Case.DoesNotExist:
-#         dic['status'] = "Failed"
-#         dic['message'] = "Empty Case"
-#         return HttpResponse(json.dumps(dic))
-#
-#     dic['status'] = "Success"
-#     dic['case_list'] = array
-#     return HttpResponse(json.dumps(dic, cls=DateEncoder))
-
 # 统计一个月早中晚入侵人数
 # 查询数据库中一个月的内容
 @csrf_exempt
@@ -685,17 +658,29 @@ def count_human_case(request):
         dic['message'] = "Wrong Method"
         return HttpResponse(json.dumps(dic))
     try:
+
         now = datetime.datetime.now()
         start = now - datetime.timedelta(days=30)
         # --gt 大于 --gte大于等于 datetime 递增
-        cases = Case.objects.filter( date_time__gte=start,case_type=2).order_by('date_time')  # 筛选一个月内的未知人员入侵
-        # 再次筛选出早中晚,时间段为4-11 11-18 18-4
-        #
-        array = []
+        cases = Case.objects.filter(date_time__gte=start, case_type=2)
+        morning = noon = evening = 0
+        # 4-11 11-18 18-04
         for case in cases:
-            dicx = {'id': case.id, 'checked': case.checked, 'case_description': case.case_description,
-                    'level': case.level, 'date_time': case.date_time, 'img': case.img}
-            array.append(dicx)
+            # dicx=case.date_time.strftime('%S-%M-%H-%Y-%m-%d')
+            dicx = case.date_time.strftime('%H')
+            hour = int(dicx)
+            if 0 <= hour < 4:
+                evening = evening + 1
+            elif 4 <= hour < 11:
+                morning = morning + 1
+            elif 11 <= hour < 18:
+                noon = noon + 1
+            else:
+                evening = evening + 1
+        dic['status'] = "Success"
+        dic['morning'] = morning
+        dic['noon'] = noon
+        dic['evening'] = evening
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
@@ -705,13 +690,134 @@ def count_human_case(request):
         dic['message'] = "Empty Case"
         return HttpResponse(json.dumps(dic))
 
-    dic['status'] = "Success"
-    dic['case_list'] = array
-    return HttpResponse(json.dumps(dic, cls=DateEncoder))
+    return HttpResponse(json.dumps(dic))
+
+
+# 一个月内早中晚入侵车辆统计
+@csrf_exempt
+def count_car_case(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=30)
+        cases = Case.objects.filter(date_time__gte=start, case_type=1)
+        morning = noon = evening = 0
+        for case in cases:
+            dicx = case.date_time.strftime('%H')
+            hour = int(dicx)
+            if 0 <= hour < 4:
+                evening = evening + 1
+            elif 4 <= hour < 11:
+                morning = morning + 1
+            elif 11 <= hour < 18:
+                noon = noon + 1
+            else:
+                evening = evening + 1
+        dic['status'] = "Success"
+        dic['morning'] = morning
+        dic['noon'] = noon
+        dic['evening'] = evening
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty Case"
+        return HttpResponse(json.dumps(dic))
+
+    return HttpResponse(json.dumps(dic))
+
+
+#   一月内入侵人员年龄统计
+@csrf_exempt
+def count_human_age(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=30)
+        cases = Case.objects.filter(date_time__gte=start, case_type=2)
+        dic['status'] = 'Success'
+        dic['0-18'] = dic['18-45'] = dic['45-65'] = dic['65-100'] = 0
+        for case in cases:
+            dicx = {}
+            des = case.case_description
+            gender, age = des.split(',')
+            w1, w2 = age.split('(')
+            w3, w4 = w2.split(')')
+            begin, end = w3.split('-')
+            age_begin = int(begin)
+            age_end = int(end)
+            age = (age_begin + age_end) / 2
+            dicx['gender'] = gender
+            dicx['age'] = age
+            if 0 <= age < 18:
+                dic['0-18'] = dic['0-18'] + 1
+            elif 18 <= age < 45:
+                dic['18-45'] = dic['18-45'] + 1
+            elif 45 <= age < 65:
+                dic['45-65'] = dic['45-65'] + 1
+            elif 65 <= age < 100:
+                dic['65-100'] = dic['65-100'] + 1
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty Case"
+        return HttpResponse(json.dumps(dic))
+
+    return HttpResponse(json.dumps(dic))
+
+
+#   一月内入侵人员性别统计
+@csrf_exempt
+def count_human_gender(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=30)
+        cases = Case.objects.filter(date_time__gte=start, case_type=2)
+        dic['status'] = 'Success'
+        dic['male'] = dic['female'] = 0
+        for case in cases:
+            dicx = {}
+            des = case.case_description
+            gender, age = des.split(',')
+            if gender == 'Male':
+                dic['male'] = dic['male'] + 1
+            elif gender == 'Female':
+                dic['female'] = dic['female'] + 1
+
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty Case"
+        return HttpResponse(json.dumps(dic))
+
+    return HttpResponse(json.dumps(dic))
 
 
 # 统计一周内每天新注册用户
-# 查询数据库中一个月的内容
 @csrf_exempt
 def count_user_register(request):
     dic = {}
@@ -722,15 +828,35 @@ def count_user_register(request):
     try:
         now = datetime.datetime.now()
         start = now - datetime.timedelta(days=7)
-        # --gt 大于 --gte大于等于 datetime 递增
-        users= User.objects.filter(date_time__gte=start,date_time__day=26).order_by('date_time')  # 筛选一个月内的未知人员入侵
-        # users = User.objects.filter(date_time__day=26)
-        # 再次筛选出早中晚,时间段为4-11 11-18 18-4
-        #
-        array = []
+        users = User.objects.filter(date_time__gte=start)
+        # monday = tuesday = wednesday = thursday = friday = saturday = sunday = 0
+        dic['status'] = "Success"
+        dic['monday'] = dic['tuesday'] = dic['wednesday'] = dic['thursday'] = dic['friday'] = dic['saturday'] = dic[
+            'sunday'] = 0
         for user in users:
-            dicx = {'id': user.id, 'permission':user.permission,'username':user.username,'date_time':user.date_time}
-            array.append(dicx)
+            day = user.date_time.weekday()  # 0-6 星期一到星期日
+            if day == 0:
+                # monday = monday + 1
+                dic['monday'] = dic['monday'] + 1
+            elif day == 1:
+                # tuesday = tuesday + 1
+                dic['tuesday'] = dic['tuesday'] + 1
+            elif day == 2:
+                # wednesday = wednesday + 1
+                dic[' wednesday'] = dic[' wednesday'] + 1
+            elif day == 3:
+                # thursday = thursday + 1
+                dic['thursday'] = dic['thursday'] + 1
+            elif day == 4:
+                # friday = friday + 1
+                dic['friday'] = dic['friday'] + 1
+            elif day == 5:
+                # saturday = saturday + 1
+                dic['saturday'] = dic['saturday'] + 1
+            elif day == 6:
+                # sunday = sunday + 1
+                dic['sunday'] = dic['sunday'] + 1
+
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
@@ -740,10 +866,49 @@ def count_user_register(request):
         dic['message'] = "Empty User"
         return HttpResponse(json.dumps(dic))
 
-    dic['status'] = "Success"
-    dic['case_list'] = array
-    return HttpResponse(json.dumps(dic, cls=DateEncoder))
+    return HttpResponse(json.dumps(dic))
 
+
+
+# 一周内每天入侵车和人情况
+@csrf_exempt
+def count_week_case(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+
+        now = datetime.datetime.now()
+        start = now - datetime.timedelta(days=30)
+        cases = Case.objects.filter(date_time__gte=start, case_type=1)
+        morning = noon = evening = 0
+        for case in cases:
+            dicx = case.date_time.strftime('%H')
+            hour = int(dicx)
+            if 0 <= hour < 4:
+                evening = evening + 1
+            elif 4 <= hour < 11:
+                morning = morning + 1
+            elif 11 <= hour < 18:
+                noon = noon + 1
+            else:
+                evening = evening + 1
+        dic['status'] = "Success"
+        dic['morning'] = morning
+        dic['noon'] = noon
+        dic['evening'] = evening
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Empty Case"
+        return HttpResponse(json.dumps(dic))
+
+    return HttpResponse(json.dumps(dic))
 
 # 添加管理员账号
 # post  id

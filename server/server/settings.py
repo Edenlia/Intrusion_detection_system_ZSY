@@ -92,6 +92,14 @@ DATABASES = {
         'POST': 3306,  # 端口
 
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',  # 数据库引擎
+    #     'NAME': 'intrusion_detection_system',  # 数据库名
+    #     'USER': 'root',  # 账号
+    #     'PASSWORD': '123456',  # 密码
+    #     'HOST': 'localhost',  # HOST
+    #     'POST': 3306,  # 端口
+    # }
 }
 
 # Password validation

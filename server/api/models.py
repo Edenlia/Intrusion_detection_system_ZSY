@@ -12,7 +12,7 @@ class User(models.Model):
     permission = models.IntegerField(default=0)  # user is 0 ,admin=1
     username = models.CharField(max_length=30)
     password = models.TextField()
-    date_time = models.DateField(default=timezone.now())
+    date_time = models.DateTimeField(default=timezone.now())
 
     # 注册时间,默认
 
