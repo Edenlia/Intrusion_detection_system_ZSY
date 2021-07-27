@@ -29,7 +29,6 @@
 <script>
 import {Notify} from "quasar";
 import {api} from "boot/axios";
-
 export default {
   name: "Profile",
   data(){
@@ -104,5 +103,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

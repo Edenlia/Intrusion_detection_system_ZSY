@@ -5,13 +5,13 @@
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头1</div>
           <div class="col">
-            <img style="width: 577px; height: 268px" src="http://127.0.0.1:8000/video/test1">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[0])">
           </div>
         </div>
         <div class="col-6 q-px-md column">
           <div class="text-center col-1">摄像头2</div>
           <div class="col">
-            <img style="width: 577px; height: 268px" src="http://127.0.0.1:8000/video/test1">
+            <img style="width: 577px; height: 268px" :src="img_exist(camera_urls[1])">
           </div>
         </div>
       </div>
@@ -36,7 +36,9 @@
 <script>
 export default {
   name: "Home",
+  created:{
 
+  },
   data(){
     return{
       img_error_url: 'img_error.jpg',
@@ -44,6 +46,9 @@ export default {
     }
   },
   methods:{
+    get_cameras(){
+
+    },
     img_exist(url){
       if(url === ''){
         return require('assets/img/img_error.jpg')

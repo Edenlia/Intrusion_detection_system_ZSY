@@ -66,9 +66,10 @@
 
 <script>
 
-import { Dialog } from 'quasar'
+import {Dialog, Notify} from 'quasar'
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import axios from "axios";
 
 export default {
   setup () {
@@ -76,10 +77,18 @@ export default {
       type: ref('line')
     }
   },
-
+  created(){
+    if(sessionStorage.getItem('user_id') === null){
+      this.$router.push('/')
+      return
+    }
+    this.user_id = sessionStorage.getItem('user_id')
+    this.get_cameras()
+  },
   name: "Camera",
   data(){
     return{
+      user_id: "",
       add_camera_dialog: false,
       camera_name: "",
       camera_address: "",
@@ -94,9 +103,9 @@ export default {
           sortable: true
         },
         { name: 'camera_name', align: 'center', label: '摄像头命名', field: 'camera_name'},
-        { name: 'camera_url', label: '摄像头url地址', field: 'case_type', sortable: true },
-        { name: 'camera_type', label: '摄像头类型', field: 'level' },
-        { name: 'camera_description', label: '摄像头描述', field: 'date_time' },
+        { name: 'camera_url', label: '摄像头url地址', field: 'camera_url', sortable: true },
+        { name: 'camera_type', label: '摄像头类型', field: 'camera_type' },
+        { name: 'camera_description', label: '摄像头描述', field: 'camera_description' },
       ],
       cameras:[],
     }
@@ -104,6 +113,43 @@ export default {
   methods:{
     add_camera(){
 
+    },
+    get_cameras(){
+      let _this = this
+      let user_id = this.user_id
+      console.log(user_id)
+      axios.post("http://127.0.0.1:8000/api/camera/query_camera/", {
+        id : user_id
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          let camera_list = res.camera_list
+          for(let i = 0; i < camera_list.length; i++){
+            let row = {}
+            row.id = camera_list[i].id
+            row.camera_name = camera_list[i].name
+            row.camera_url = camera_list[i].url
+            row.camera_type = camera_list[i].type
+            row.camera_description = camera_list[i].description
+            _this.cameras.push(row)
+          }
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     },
     go_camera_detail(){
 
