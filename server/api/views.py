@@ -1,12 +1,12 @@
 from django.contrib.auth.hashers import make_password, check_password
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
 import json
 import datetime
 from django.utils import timezone
 # 导入model中的User
 from .models import User, Camera, Case
+from django.views.decorators import gzip
 
 # 代码编码规则
 # 下划线命名法
@@ -15,6 +15,7 @@ from .models import User, Camera, Case
 import base64
 import cv2
 
+video_cameras = []
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -776,3 +777,65 @@ def add_admin(request):
         user.save()
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
+
+
+
+
+
+
+
+def start_camera(url):
+    camera = Camera.objects.get(url=url)
+    for video_camera in video_cameras:
+        if camera.name == video_camera.name:
+            return
+    cam = VideoCamera(camera.url, camera.name)
+    video_cameras.append(cam)
+
+
+class VideoCamera(object):
+    def __init__(self, url, name):
+        self.name = name
+        self.video = cv2.VideoCapture(url)
+        (self.grabbed, self.frame) = self.video.read()
+        threading.Thread(target=self.update, args=()).start()
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        image = self.frame
+        _, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+    def update(self):
+        try:
+            while True:
+
+                (self.grabbed, self.frame) = self.video.read()
+        except BaseException:
+            print("error")
+
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@gzip.gzip_page
+@csrf_exempt
+def live(request, name):
+    camera = None
+
+    for video_camera in video_cameras:
+        if video_camera.name is name:
+            flag = true
+            break
+    if camera is None:
+        # img_data = open(, "rb").read()
+        return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
+    else:
+        return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")
+

@@ -30,6 +30,11 @@
       <br/>
       <q-list>
         <q-expansion-item
+          v-if="this.$route.path === '/home'
+          || this.$route.path === '/case'
+          || this.$route.path === '/analytics'
+          || this.$route.path === '/camera'
+          || this.$route.path === '/profile'"
           style="background: #001529"
           class="text-white"
           dense
@@ -38,25 +43,29 @@
           icon="subject"
           label="功能"
         >
-          <q-item class="text-grey-1" style="background: #000c17" to="/home">
+          <q-item
+            class="text-grey-1" style="background: #000c17" to="/home">
             <q-item-section side>
               <q-icon name="home"></q-icon>
             </q-item-section>
             <q-item-section>主页</q-item-section>
           </q-item>
-          <q-item class="text-grey-1" style="background: #000c17" to="/camera">
+          <q-item
+                  class="text-grey-1" style="background: #000c17" to="/camera">
             <q-item-section side>
               <q-icon name="videocam"></q-icon>
             </q-item-section>
             <q-item-section>摄像头</q-item-section>
           </q-item >
-          <q-item class="text-grey-1" style="background: #000c17" to="/case">
+          <q-item
+                  class="text-grey-1" style="background: #000c17" to="/case">
             <q-item-section side>
               <q-icon name="highlight_off"></q-icon>
             </q-item-section>
             <q-item-section>检测到异常</q-item-section>
           </q-item>
-          <q-item class="text-grey-1" style="background: #000c17" to="/analytics">
+          <q-item
+                  class="text-grey-1" style="background: #000c17" to="/analytics">
             <q-item-section side>
               <q-icon name="analytics"></q-icon>
             </q-item-section>
@@ -64,6 +73,11 @@
           </q-item>
         </q-expansion-item>
         <q-expansion-item
+          v-if="this.$route.path === '/home'
+          || this.$route.path === '/case'
+          || this.$route.path === '/analytics'
+          || this.$route.path === '/camera'
+          || this.$route.path === '/profile'"
           style="background: #001529"
           class="text-white"
           dense
@@ -73,6 +87,60 @@
           label="设置"
         >
           <q-item class="text-grey-1" style="background: #000c17" to="/profile">
+            <q-item-section side>
+              <q-icon name="account_circle"></q-icon>
+            </q-item-section>
+            <q-item-section>修改个人信息</q-item-section>
+          </q-item>
+          <q-item class="text-grey-1" style="background: #000c17" to="/">
+            <q-item-section side>
+              <q-icon name="logout"></q-icon>
+            </q-item-section>
+            <q-item-section>退出登录</q-item-section>
+          </q-item>
+        </q-expansion-item>
+        <q-expansion-item
+          v-if="this.$route.path === '/admin_home'
+          || this.$route.path === '/admin_analytics'
+          || this.$route.path === '/admin_profile'
+          || this.$route.path === '/admin_user_analytics'"
+          style="background: #001529"
+          class="text-white"
+          dense
+          dense-toggle
+          expand-separator
+          icon="subject"
+          label="功能"
+        >
+          <q-item
+            class="text-grey-1" style="background: #000c17" to="/admin_home">
+            <q-item-section side>
+              <q-icon name="home"></q-icon>
+            </q-item-section>
+            <q-item-section>主页</q-item-section>
+          </q-item>
+          <q-item
+            class="text-grey-1" style="background: #000c17" to="/admin_analytics">
+            <q-item-section side>
+              <q-icon name="analytics"></q-icon>
+            </q-item-section>
+            <q-item-section>统计信息</q-item-section>
+          </q-item>
+        </q-expansion-item>
+        <q-expansion-item
+          v-if="this.$route.path === '/admin_home'
+          || this.$route.path === '/admin_analytics'
+          || this.$route.path === '/admin_profile'
+          || this.$route.path === '/admin_user_analytics'"
+          style="background: #001529"
+          class="text-white"
+          dense
+          dense-toggle
+          expand-separator
+          icon="settings"
+          label="设置"
+        >
+          <q-item class="text-grey-1" style="background: #000c17" to="/admin_profile">
             <q-item-section side>
               <q-icon name="account_circle"></q-icon>
             </q-item-section>

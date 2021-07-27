@@ -33,6 +33,7 @@ import {Notify} from "quasar";
 
 export default {
   name: "Login",
+
   data(){
     return{
       username: "",
@@ -50,7 +51,9 @@ export default {
         let res = response.data
         if(res.status === "Success"){
           sessionStorage.setItem('user_id', res.id)
-          _this.$router.push("/home")
+          sessionStorage.setItem('user_permission', res.permission)
+          if(res.permission === 0) _this.$router.push("/home")
+          else _this.$router.push("/admin_home")
         }else{
           Notify.create(
             {

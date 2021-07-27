@@ -44,6 +44,18 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+
+        <q-table
+          class="my-sticky-header-table q-mt-xl"
+          title="摄像头"
+          :rows=cameras
+          :columns=columns
+          row-key="id"
+          flat
+          bordered
+          @row-click="go_camera_detail"
+        >
+        </q-table>
       </div>
       <div class="col q-pa-md">
 
@@ -72,11 +84,28 @@ export default {
       camera_name: "",
       camera_address: "",
       camera_description: "",
-
+      columns: [
+        {
+          name: 'id',
+          required: true,
+          label: '摄像头编号',
+          align: 'left',
+          field: row => row.id,
+          sortable: true
+        },
+        { name: 'camera_name', align: 'center', label: '摄像头命名', field: 'camera_name'},
+        { name: 'camera_url', label: '摄像头url地址', field: 'case_type', sortable: true },
+        { name: 'camera_type', label: '摄像头类型', field: 'level' },
+        { name: 'camera_description', label: '摄像头描述', field: 'date_time' },
+      ],
+      cameras:[],
     }
   },
   methods:{
     add_camera(){
+
+    },
+    go_camera_detail(){
 
     }
   }
