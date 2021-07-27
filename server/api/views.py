@@ -1,4 +1,3 @@
-
 import threading
 
 from django.contrib.auth.hashers import make_password, check_password
@@ -19,7 +18,9 @@ from .models import User, Camera, Case
 
 import base64
 import cv2
-video_cameras=[]
+
+video_cameras = []
+
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -650,6 +651,7 @@ def query_case(request):
 
     return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
+
 # 统计一周内每天新注册用户
 # 查询数据库中一个月的内容
 @csrf_exempt
@@ -663,13 +665,14 @@ def count_user_register(request):
         now = datetime.datetime.now()
         start = now - datetime.timedelta(days=7)
         # --gt 大于 --gte大于等于 datetime 递增
-        users= User.objects.filter(date_time__gte=start,date_time__day=26).order_by('date_time')  # 筛选一个月内的未知人员入侵
+        users = User.objects.filter(date_time__gte=start, date_time__day=26).order_by('date_time')  # 筛选一个月内的未知人员入侵
         # users = User.objects.filter(date_time__day=26)
         # 再次筛选出早中晚,时间段为4-11 11-18 18-4
         #
         array = []
         for user in users:
-            dicx = {'id': user.id, 'permission':user.permission,'username':user.username,'date_time':user.date_time}
+            dicx = {'id': user.id, 'permission': user.permission, 'username': user.username,
+                    'date_time': user.date_time}
             array.append(dicx)
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
@@ -685,14 +688,10 @@ def count_user_register(request):
     return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
 
-
-
-
-
-# 统计一个月早中晚入侵人数
+# 统计一个月早中晚入侵人数和车
 # 查询数据库中一个月的内容
 @csrf_exempt
-def count_human_all(request):
+def count_all(request):
     dic = {}
     if request.method != 'POST':
         dic['status'] = "Failed"
@@ -702,26 +701,23 @@ def count_human_all(request):
 
         now = datetime.datetime.now()
         start = now - datetime.timedelta(days=30)
-        # --gt 大于 --gte大于等于 datetime 递增
-        cases = Case.objects.filter(date_time__gte=start, case_type=2)
-        morning = noon = evening = 0
-        # 4-11 11-18 18-04
-        for case in cases:
-            # dicx=case.date_time.strftime('%S-%M-%H-%Y-%m-%d')
-            dicx = case.date_time.strftime('%H')
-            hour = int(dicx)
-            if 0 <= hour < 4:
-                evening = evening + 1
-            elif 4 <= hour < 11:
-                morning = morning + 1
-            elif 11 <= hour < 18:
-                noon = noon + 1
-            else:
-                evening = evening + 1
-        dic['status'] = "Success"
-        dic['morning'] = morning
-        dic['noon'] = noon
-        dic['evening'] = evening
+        array = []
+        for i in range(2):
+            dis = {'morning': 0, 'noon': 0, 'evening': 0}
+            cases = Case.objects.filter(date_time__gte=start, case_type=i + 1)
+            for case in cases:
+                dicx = case.date_time.strftime('%H')
+                hour = int(dicx)
+                if 0 <= hour < 4:
+                    dis['evening']=dis['evening']+1
+                elif 4 <= hour < 11:
+                    dis['morning'] = dis['morning'] + 1
+                elif 11 <= hour < 18:
+                    dis['noon'] = dis['noon'] + 1
+                else:
+                    dis['evening'] = dis['evening'] + 1
+            array.append(dis)
+
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
@@ -731,11 +727,12 @@ def count_human_all(request):
         dic['message'] = "Empty Case"
         return HttpResponse(json.dumps(dic))
 
+    dic['status'] = 'Successes'
+    dic['case_list'] = array
     return HttpResponse(json.dumps(dic))
 
 
-
-#实现一周 四个摄像头情况和合起来情况
+# 实现一周 四个摄像头情况和合起来情况
 @csrf_exempt
 def count_week_camera(request):
     dic = {}
@@ -776,7 +773,7 @@ def count_week_camera(request):
                     disc['sunday'] = disc['sunday'] + 1
 
             array.append(disc)
-            dicx['monday']=dicx['monday']+disc['monday']
+            dicx['monday'] = dicx['monday'] + disc['monday']
             dicx['tuesday'] = dicx['tuesday'] + disc['tuesday']
             dicx['wednesday'] = dicx['wednesday'] + disc['wednesday']
             dicx['thursday'] = dicx['thursday'] + disc['thursday']
@@ -796,8 +793,6 @@ def count_week_camera(request):
     dic['case'] = dicx
     dic['case_list'] = array
     return HttpResponse(json.dumps(dic))
-
-
 
 
 # 统计入侵用户年龄和性别信息
@@ -857,7 +852,6 @@ def count_human_user(request):
     return HttpResponse(json.dumps(dic))
 
 
-
 # 添加管理员账号
 # post  id
 @csrf_exempt
@@ -890,6 +884,7 @@ def add_admin(request):
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
 
+
 def start_camera(url):
     camera = Camera.objects.get(url=url)
     for video_camera in video_cameras:
@@ -917,7 +912,6 @@ class VideoCamera(object):
     def update(self):
         try:
             while True:
-
                 (self.grabbed, self.frame) = self.video.read()
         except BaseException:
             print("error")
@@ -944,4 +938,3 @@ def live(request, name):
         return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
     else:
         return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")
-

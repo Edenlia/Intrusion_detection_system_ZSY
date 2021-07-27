@@ -24,7 +24,7 @@ urlpatterns = [
     path('case/query_case/', views.query_case, name='query_case'),
 
     path('count/count_user_register/', views.count_user_register),
-    path('count/count_huaman_all/', views.count_human_all),  # 管理员查看一个月早中晚入侵人数
+    path('count/count_all/', views.count_all),  # 管理员查看一个月早中晚入侵人数
     path('count/count_human_user/', views.count_human_user),  # 用户查看一个月入侵人年龄和性别
     path('count/count_week_camera/', views.count_week_camera),  # 用户看每周摄像头检测情况和各个摄像头检测情况
 
