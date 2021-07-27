@@ -12,7 +12,7 @@ class User(models.Model):
     permission = models.IntegerField(default=0)  # user is 0 ,admin=1
     username = models.CharField(max_length=30)
     password = models.TextField()
-    date_time = models.DateTimeField(default=timezone.now())
+    date_time = models.DateField(default=timezone.now())
 
     # 注册时间,默认
 
@@ -25,7 +25,7 @@ class User(models.Model):
 class Camera(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=80)
-    type = models.IntegerField()  # 0.正常情况（一般不会出现，占位用） 1.区域熟人进入 2.普通区域陌生人入侵，脸部情况  3.车辆进入识别车牌 4.危险区域人员入侵
+    type = models.IntegerField()  # case type 1 未知车辆闯入 case type 2 未知人员闯入 case type 3 敏感区域有人闯入
     url = models.CharField(max_length=100)
     description = models.TextField()
     owner = models.ForeignKey(
@@ -36,13 +36,11 @@ class Camera(models.Model):
 class Case(models.Model):
     id = models.BigAutoField(primary_key=True)
     checked = models.BooleanField(default=0)
-    case_type = models.IntegerField()  # 什么样的  0 1.区域熟人进入 2.普通区域陌生人入侵，脸部情况  3.车辆进入识别车牌 4.危险区域人员入侵
-
+    case_type = models.IntegerField()   # case type 1 未知车辆闯入 case type 2 未知人员闯入 case type 3 敏感区域有人闯入
     case_description = models.TextField()  # 描述信息
     level = models.IntegerField()
-    # 1.人员0-18  2.车辆 3.人员45 -65 4.人员18-45 5.危险区域
-    date_time = models.DateTimeField(default=timezone.now())
-    img = models.TextField()  # base64图片文件,包含前缀
+    date_time = models.DateTimeField(default=datetime.now())
+    img = models.TextField()  # url
     # img = models.ImageField(upload_to='img')
     detect_camera = models.ForeignKey(
         Camera, on_delete=models.CASCADE, related_name='camera'

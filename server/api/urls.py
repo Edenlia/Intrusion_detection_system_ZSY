@@ -18,9 +18,12 @@ urlpatterns = [
     path('camera/change_name/', views.change_name, name='change_name'),
     path('camera/query_camera/', views.query_camera, name='query_camera'),
 
-    path('case/delete_case/',views.delete_case,name='delete_case'),
-    path('case/change_checked/',views.change_checked,name='change_checked'),
+    path('case/delete_case/', views.delete_case, name='delete_case'),
+    path('case/change_checked/', views.change_checked, name='change_checked'),
     path('case/query_all_case/', views.query_all_case, name='query_all_case'),
-    path('case/query_case/',views.query_case,name='query_case'),
+    path('case/query_case/', views.query_case, name='query_case'),
+
+    path('count/count_human_case/', views.count_human_case, name='count_human_case'),  # 一个月内早中晚入侵人员统计
+    path('count/count_user_register/',views.count_user_register),
 
 ]
