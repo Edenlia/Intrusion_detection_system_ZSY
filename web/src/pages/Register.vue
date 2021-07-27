@@ -56,7 +56,7 @@ export default {
         return
       }
       let _this = this
-      api.post("http://192.168.43.28:8000/api/log/register/", {
+      api.post("http://127.0.0.1:8000/api/log/register/", {
         username: this.username,
         password: this.password
       }).then(function(response){

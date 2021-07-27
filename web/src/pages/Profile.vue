@@ -59,7 +59,7 @@ export default {
         return
       }
       let _this = this
-      api.post("http://192.168.43.28:8000/api/log/change_password/", {
+      api.post("http://127.0.0.1:8000.28:8000/api/log/change_password/", {
         id: this.user_id,
         username: this.username,
         password: this.password
