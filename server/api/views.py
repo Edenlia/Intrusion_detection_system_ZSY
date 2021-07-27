@@ -1,5 +1,10 @@
+
+import threading
+
 from django.contrib.auth.hashers import make_password, check_password
-from django.http import HttpResponse
+from django.db.models import Q
+from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
+from django.views.decorators import gzip
 from django.views.decorators.csrf import csrf_exempt
 
 import json
@@ -14,7 +19,7 @@ from .models import User, Camera, Case
 
 import base64
 import cv2
-
+video_cameras=[]
 
 class DateEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -932,7 +937,7 @@ def live(request, name):
 
     for video_camera in video_cameras:
         if video_camera.name is name:
-            flag = true
+            flag = True
             break
     if camera is None:
         # img_data = open(, "rb").read()
