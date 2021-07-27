@@ -16,7 +16,7 @@ const routes = [
       { path: 'admin_analytics', component: () => import('pages/AdminAnalytics.vue') },
       { path: 'admin_home', component: () => import('pages/AdminHome.vue') },
       { path: 'admin_profile', component: () => import('pages/AdminProfile.vue') },
-      { path: 'admin_user_analytics', component: () => import('pages/AdminUserAnalytics.vue') },
+      { path: 'admin_user_analytics/:id', component: () => import('pages/AdminUserAnalytics.vue') },
     ]
   },
   // Always leave this as last one,

@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import make_password, check_password
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
-
+from django.views.decorators import gzip
 import json
 import datetime
 from django.utils import timezone
@@ -1095,6 +1095,7 @@ def add_admin(request):
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
 
+
 def start_camera(url):
     camera = Camera.objects.get(url=url)
     for video_camera in video_cameras:
@@ -1149,4 +1150,3 @@ def live(request, name):
         return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
     else:
         return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")
-
