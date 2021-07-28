@@ -15,8 +15,10 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "echarts": "^5.1.2",
+    "global": "^4.4.0",
     "quasar": "^2.0.0",
-    "vue-echarts": "^6.0.0-rc.6"
+    "vue-echarts": "^6.0.0-rc.6",
+    "vue-video-player": "^5.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

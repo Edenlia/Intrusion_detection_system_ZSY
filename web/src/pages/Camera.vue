@@ -2,7 +2,7 @@
   <q-page class="flex" style="background: #f0f2f5">
     <div class=" full-width column bg-white q-ma-md" style="height: 650px">
       <div class="col-1 q-pt-md q-pl-md">
-        <q-btn class="bg-blue text-white" label="添加摄像头" @click="add_camera_dialog = true">
+        <q-btn class="bg-blue text-white" label="添加摄像头" @click="if_add_camera">
           <q-icon name="add"></q-icon>
         </q-btn>
         <q-dialog v-model="add_camera_dialog" persistent>
@@ -41,6 +41,19 @@
             <q-card-actions align="right" class="text-primary">
               <q-btn flat label="取消" v-close-popup />
               <q-btn flat label="确定" v-close-popup @click="add_camera"/>
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
+        <q-dialog v-model="cant_add_camera_dialog">
+          <q-card style="width: 400px">
+            <q-card-section class="text-h4">
+              警告
+            </q-card-section>
+            <q-card-section>
+              最多添加四个摄像头
+            </q-card-section>
+            <q-card-actions align="right">
+              <q-btn flat label="确认" color="primary" v-close-popup />
             </q-card-actions>
           </q-card>
         </q-dialog>
@@ -93,6 +106,7 @@ export default {
       camera_name: "",
       camera_address: "",
       camera_description: "",
+      cant_add_camera_dialog: false,
       columns: [
         {
           name: 'id',
@@ -111,6 +125,10 @@ export default {
     }
   },
   methods:{
+    if_add_camera(){
+      if(this.cameras.length <= 4) this.add_camera_dialog=true
+      else this.cant_add_camera_dialog=true
+    },
     add_camera(){
 
     },
@@ -118,7 +136,7 @@ export default {
       let _this = this
       let user_id = this.user_id
       console.log(user_id)
-      axios.post("http://127.0.0.1:8000/api/camera/query_camera/", {
+      axios.post("http://172.30.68.249:8000/api/camera/query_camera/", {
         id : user_id
       }).then(function(response){
         console.log(response)

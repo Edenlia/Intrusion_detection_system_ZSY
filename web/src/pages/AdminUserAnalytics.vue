@@ -54,6 +54,8 @@ import {
   GridComponent,
 } from "echarts/components";
 import VChart, {THEME_KEY} from "vue-echarts";
+import axios from "axios";
+import {Notify} from "quasar";
 use([
   CanvasRenderer,
   PieChart,
@@ -73,6 +75,9 @@ export default {
   },
   provide: {
     [THEME_KEY]: "dark"
+  },
+  created(){
+    this.get_admin_data()
   },
   data() {
     return {
@@ -205,7 +210,7 @@ export default {
           }
         },
         legend: {
-          data: ['一号区域', '二号区域', '三号区域', '四号区域']
+          data: ['未使用', '未使用', '未使用', '未使用']
         },
         toolbox: {
           feature: {
@@ -239,7 +244,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [120, 132, 101, 134, 90, 230, 210]
+            data: [0, 0, 0, 0, 0, 0, 0]
           },
           {
             name: '二号区域',
@@ -249,7 +254,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [220, 182, 191, 234, 290, 330, 310]
+            data: [0, 0, 0, 0, 0, 0, 0]
           },
           {
             name: '三号区域',
@@ -259,7 +264,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [150, 232, 201, 154, 190, 330, 410]
+            data: [0, 0, 0, 0, 0, 0, 0]
           },
           {
             name: '四号区域',
@@ -273,7 +278,7 @@ export default {
             emphasis: {
               focus: 'series'
             },
-            data: [320, 332, 301, 334, 390, 330, 320]
+            data: [0, 0, 0, 0, 0, 0, 0]
           },
         ]
       },
@@ -282,8 +287,79 @@ export default {
   methods:{
     back(){
       this.$router.go(-1)
+    },
+    get_admin_data(){
+      let _this = this
+      let user_id = this.id
+      // console.log(user_id)
+      console.log(this.id)
+      axios.post(" http://172.30.68.249:8000/api/count/count_user/", {
+        id : user_id
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        console.log(res.case_month.e0_18)
+        if(res.status === "Success"){
+          _this.option1.series[0].data[0].value = res.case_month.e0_18
+          _this.option1.series[0].data[1].value = res.case_month.e18_45
+          _this.option1.series[0].data[2].value = res.case_month.e45_65
+          _this.option1.series[0].data[3].value = res.case_month.e65_100
+          _this.option2.series[0].data[0].value = res.case_month.male
+          _this.option2.series[0].data[1].value = res.case_month.female
+          _this.option3.series[0].data[0] = res.case.monday
+          _this.option3.series[0].data[1] = res.case.tuesday
+          _this.option3.series[0].data[2] = res.case.wednesday
+          _this.option3.series[0].data[3] = res.case.thursday
+          _this.option3.series[0].data[4] = res.case.friday
+          _this.option3.series[0].data[5] = res.case.saturday
+          _this.option3.series[0].data[6] = res.case.sunday
+          let camera_list = res.case_list
+          for(let i = 0; i < camera_list.length; i++){
+            _this.option4.legend.data[i] = camera_list[i].camera_name
+            _this.option4.series[i].name = camera_list[i].camera_name
+            _this.option4.series[i].data[0] = camera_list[i].monday
+            _this.option4.series[i].data[1] = camera_list[i].tuesday
+            _this.option4.series[i].data[2] = camera_list[i].wednesday
+            _this.option4.series[i].data[3] = camera_list[i].thursday
+            _this.option4.series[i].data[4] = camera_list[i].friday
+            _this.option4.series[i].data[5] = camera_list[i].saturday
+            _this.option4.series[i].data[6] = camera_list[i].sunday
+
+          }
+          // console.log(res.register_list[0].monday)
+          // _this.option4.series[0].data[0] = res.register_list[0].monday
+          // console.log(1)
+          // _this.option4.series[0].data[1] = res.register_list[0].tuesday
+          // console.log(1)
+          // _this.option4.series[0].data[2] = res.register_list[0].wednesday
+          // console.log(1)
+          // _this.option4.series[0].data[3] = res.register_list[0].thursday
+          // console.log(1)
+          // _this.option4.series[0].data[4] = res.register_list[0].friday
+          // console.log(1)
+          // _this.option4.series[0].data[5] = res.register_list[0].saturday
+          // console.log(1)
+          // _this.option4.series[0].data[6] = res.register_list[0].sunday
+          // // console.log(1)
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
-  }
+
+  },
 };
 </script>
 

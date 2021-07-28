@@ -16,11 +16,13 @@
             class="col-3"
             filled
             v-model="password"
+            type="password"
             label="密码"/>
           <q-input
             class="col-3"
             filled
             v-model="confirm"
+            type="password"
             label="确认密码"/>
           <div class="col-1"></div>
           <q-btn class="full-width col-2" label="登录" type="submit" color="blue"></q-btn>
@@ -56,7 +58,7 @@ export default {
         return
       }
       let _this = this
-      api.post("http://127.0.0.1:8000/api/log/register/", {
+      api.post("http://172.30.68.249:8000/api/log/register/", {
         username: this.username,
         password: this.password
       }).then(function(response){

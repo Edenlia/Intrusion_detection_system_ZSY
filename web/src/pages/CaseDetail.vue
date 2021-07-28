@@ -16,6 +16,7 @@
         <div class="col q-pa-md text-h5 q-ml-xl">异常等级：{{ level }}</div>
         <div class="col q-pa-md text-h5 q-ml-xl">是否被查阅：{{ checked ? '已查阅' : '未查阅' }}</div>
         <div class="col q-pa-md text-h5 q-ml-xl">出现时间：{{ date_time }}</div>
+        <div class="col q-pa-md text-h5 q-ml-xl">详情：{{ description }}</div>
         <div class="col-2 row">
           <q-btn class=" q-ma-md q-ml-xl bg-green text-black text-h6"  glossy
                  style="height: 60px; width: 150px; font-weight: bold"
@@ -61,6 +62,7 @@ export default {
       checked: false,
       date_time: "",
       img: "",
+      description: "",
       delete_dialog: false
     }
   },
@@ -74,7 +76,7 @@ export default {
     get_case_detail() {
       let _this = this
       let the_id = this.id
-      api.post("http://127.0.0.1:8000/api/case/query_case/", {
+      api.post("http://172.30.68.249:8000/api/case/query_case/", {
         id: the_id
       }).then(function (response){
         let res = response.data
@@ -86,6 +88,7 @@ export default {
           _this.date_time = res.date_time
           _this.checked = res.checked
           _this.img = res.img
+          _this.description = res.description
         }else{
           Notify.create(
             {
@@ -107,7 +110,7 @@ export default {
     check_case(){
       let _this = this
       let the_id = this.id
-      api.post("http://127.0.0.1:8000/api/case/change_checked/", {
+      api.post("http://172.30.68.249:8000/api/case/change_checked/", {
         id: the_id
       }).then(function (response){
         let res = response.data
@@ -139,7 +142,7 @@ export default {
     delete_case(){
       let _this = this
       let the_id = this.id
-      api.post("http://127.0.0.1:8000/api/case/delete_case/", {
+      api.post("http://172.30.68.249:8000/api/case/delete_case/", {
         id: the_id
       }).then(function (response){
         let res = response.data

@@ -19,7 +19,24 @@ from .models import User, Camera, Case
 import base64
 import cv2
 
-video_cameras = []
+# video_cameras = []
+import cv2
+import numpy as np
+from qiniu import Auth, put_file, etag
+import qiniu.config
+
+ak = 'gllUD3Ik4X7BaXw44GBY6jKfqI9K5qLhNCFZ7uf8'
+sk = 'La3cQhn95ATO4pACyogVtHWxeFvkLejMEwHh1vVv'
+bn = 'intrusion-detection-system'
+
+
+def send_img_to_server(AK, SK, BUCKET_NAME, KEY, DATA):
+    # 构建鉴权对象
+    q = Auth(AK, SK)
+    # 生成上传 Token，可以指定过期时间等
+    token = q.upload_token(BUCKET_NAME, KEY, 3600)
+    # 要上传文件的本地路径
+    ret, info = put_file(token, KEY, DATA, version='v2')
 
 
 class DateEncoder(json.JSONEncoder):
@@ -253,11 +270,13 @@ def query_all(request):
         return HttpResponse(json.dumps(dic))
     try:
         post_content = json.loads(request.body)
-        permission = post_content['permission']
-        users = User.objects.filter(permission=permission)
+        users = User.objects.all()
         array = []
         for user in users:
-            dics = {'id': user.id, "username": user.username}
+            cameras = Camera.objects.filter(owner=user)
+            dics = {'id': user.id, "username": user.username,
+                    "permission": user.permission, "date_time": user.date_time,
+                    "camera_num": len(cameras)}
             array.append(dics)
         # print(array)
     except(KeyError, json.decoder.JSONDecodeError):
@@ -273,7 +292,7 @@ def query_all(request):
     dic['user_list'] = array
     # dic['id'] = list(user.values('id'))
     # dic['username'] = list(user.values('username'))
-    return HttpResponse(json.dumps(dic))
+    return HttpResponse(json.dumps(dic, cls=DateEncoder))
 
 
 # 查询独立用户
@@ -525,31 +544,52 @@ def query_camera(request):
     return HttpResponse(json.dumps(dic))
 
 
-# 增加异常信息
-# opencv生成
-# 入侵情况 tap
-# @csrf_exempt
-# def add_case(request):
-#     dic = {}
-#     if request.method != 'POST':
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Method"
-#         return HttpResponse(json.dumps(dic))
-#     try:
-#         post_content = json.loads(request.body)
-#         xx = post_content['xx']
-#         user = User.objects.get(xx=xx)
-#     except(KeyError, json.decoder.JSONDecodeError):
-#         dic['status'] = "Failed"
-#         dic['message'] = "No Input"
-#         return HttpResponse(json.dumps(dic))
-#     except User.DoesNotExist:
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Username"
-#         return HttpResponse(json.dumps(dic))
-#
-#     dic['status'] = "Success"
-#     return HttpResponse(json.dumps(dic))
+# 增加异常
+# 传入case_type和case_description
+@csrf_exempt
+def add_case(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        case_type = post_content['case_type']
+        case_description = post_content['case_description']
+        detect_camera_id=post_content['detect_camera_id']
+        camera=Camera.objects.get(id=detect_camera_id)
+        case = Case.objects.get(case_description=case_description)
+
+
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Camera.DoesNotExist:
+        dic['status']='Failed'
+        dic['message']='Wrong Camera_id'
+    except Case.DoesNotExist:
+        dic['status'] = "Failed"
+        if case_type == 1:
+            # 上传图片
+            key = case_description + '.jpg'
+            data = post_content['img']
+
+            send_img_to_server(ak, sk, bn, key, data)
+            # http: // ids.edenlia.icu / img_error.jpg
+            img = "http://ids.edenlia.icu/" + key
+            # 添加异常
+            new_case=Case(case_type=case_type,case_description=case_description,level=3,img=img,
+                          delete_camera=camera)
+            new_case.save()
+
+
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
+
 
 # 删除异常信息
 @csrf_exempt
@@ -673,6 +713,7 @@ def query_case(request):
         dic['level'] = case.level
         dic['date_time'] = case.date_time
         dic['img'] = case.img
+        dic['description'] = case.case_description
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
@@ -797,7 +838,7 @@ def count_user(request):
         array = []
         dicx = {'monday': 0, 'tuesday': 0, 'wednesday': 0, 'thursday': 0, 'friday': 0,
                 'saturday': 0, 'sunday': 0}
-        dics = {'male': 0, 'female': 0, '0-18': 0, '18-45': 0, '45-65': 0, '65-100': 0}
+        dics = {'male': 0, 'female': 0, 'e0_18': 0, 'e18_45': 0, 'e45_65': 0, 'e65_100': 0}
         for camera in cameras:
             now = timezone.now()
             start = now - datetime.timedelta(days=7)
@@ -847,13 +888,13 @@ def count_user(request):
                 age_end = int(end)
                 age = (age_begin + age_end) / 2
                 if 0 <= age < 18:
-                    dics['0-18'] = dics['0-18'] + 1
+                    dics['e0_18'] = dics['e0_18'] + 1
                 elif 18 <= age < 45:
-                    dics['18-45'] = dics['18-45'] + 1
+                    dics['e18_45'] = dics['e18_45'] + 1
                 elif 45 <= age < 65:
-                    dics['45-65'] = dics['45-65'] + 1
+                    dics['e45_65'] = dics['e45_65'] + 1
                 elif 65 <= age < 100:
-                    dics['65-100'] = dics['65-100'] + 1
+                    dics['e65_100'] = dics['e65_100'] + 1
 
 
     except(KeyError, json.decoder.JSONDecodeError):
@@ -904,75 +945,116 @@ def add_admin(request):
         return HttpResponse(json.dumps(dic))
 
 
-def start_camera(url):
-    camera = Camera.objects.get(url=url)
-    for video_camera in video_cameras:
-        if camera.name == video_camera.name:
-            return
-    cam = VideoCamera(camera.url, camera.name, camera.type)
-    video_cameras.append(cam)
-
-
-class VideoCamera(object):
-    def __init__(self, url, name, type):
-        self.name = name
-        self.type = type
-        self.video = cv2.VideoCapture(url)
-        (self.grabbed, self.frame) = self.video.read()
-        if self.type == 1:
-            threading.Thread(target=self.licence_check(), args=()).start()
-        elif self.type == 2:
-            threading.Thread(target=self.human_face_check(), args=()).start()
-        else:
-            threading.Thread(target=self.area_check(), args=()).start()
-
-    def __del__(self):
-        self.video.release()
-
-    def get_frame(self):
-        image = self.frame
-        _, jpeg = cv2.imencode('.jpg', image)
-        return jpeg.tobytes()
-
-    def licence_check(self):
-        try:
-            while True:
-                (self.grabbed, self.frame) = self.video.read()
-        except BaseException:
-            print("error")
-
-    def human_face_check(self):
-        try:
-            while True:
-                (self.grabbed, self.frame) = self.video.read()
-        except BaseException:
-            print("error")
-
-    def area_check(self):
-        try:
-            while True:
-                (self.grabbed, self.frame) = self.video.read()
-        except BaseException:
-            print("error")
-
-
-def gen(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-
-@gzip.gzip_page
 @csrf_exempt
-def live(request, name):
-    camera = None
-    for video_camera in video_cameras:
-        if video_camera.name is name:
-            camera = video_camera
-            break
-    if camera is None:
-        # img_data = open(, "rb").read()
-        return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
-    else:
-        return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")
+def add_case(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        case_type = post_content['case_type']
+        case_description = post_content['case_description']
+        level = post_content['level']
+        img = post_content['img']
+        detect_camera_id = post_content['detect_camera_id']  # 数字id即可
+        new_case = Case(case_type=case_type, case_description=case_description, level=level, img=img,
+                        detect_camera_id=detect_camera_id)
+        new_case.save()
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
+# def start_camera(url):
+#     camera = Camera.objects.get(url=url)
+#     for video_camera in video_cameras:
+#         if camera.name == video_camera.name:
+#             return
+#     cam = VideoCamera(camera.url, camera.name, camera.type)
+#     video_cameras.append(cam)
+
+
+# class VideoCamera(object):
+#     def __init__(self, url):
+#
+#         self.video = cv2.VideoCapture(url)
+#         (self.grabbed, self.frame) = self.video.read()
+#         threading.Thread(target=self.licence_check(), args=()).start()
+#         # if self.type == 1:
+#         #     print("thread start")
+#         #
+#         # elif self.type == 2:
+#         #     threading.Thread(target=self.human_face_check(), args=()).start()
+#         # else:
+#         #     threading.Thread(target=self.area_check(), args=()).start()
+#
+#     def __del__(self):
+#         self.video.release()
+#
+#     def get_frame(self):
+#         image = self.frame
+#         _, jpeg = cv2.imencode('.jpg', image)
+#         return jpeg.tobytes()
+#
+#     def licence_check(self):
+#         try:
+#             while True:
+#                 (self.grabbed, self.frame) = self.video.read()
+#         except BaseException:
+#             print("error")
+#
+#     # def human_face_check(self):
+#     #     try:
+#     #         while True:
+#     #             (self.grabbed, self.frame) = self.video.read()
+#     #     except BaseException:
+#     #         print("error")
+#     #
+#     # def area_check(self):
+#     #     try:
+#     #         while True:
+#     #             (self.grabbed, self.frame) = self.video.read()
+#     #     except BaseException:
+#     #         print("error")
+#
+#
+# def gen(camera):
+#     while True:
+#         frame = camera.get_frame()
+#         yield (b'--frame\r\n'
+#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+#
+#
+# @gzip.gzip_page
+# @csrf_exempt
+# def live(request, name):
+#     try:
+#         # camera = Camera.objects.get(name=name)
+#         # print("url: " + camera.url)
+#         cam = VideoCamera('rtmp://localhost:1935/live/home')
+#         return StreamingHttpResponse(gen(cam), content_type="multipart/x-mixed-replace;boundary=frame")
+#     except Camera.DoesNotExist:  # This is bad! replace it with proper handling
+#         return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
+#     except BaseException:
+#         pass
+
+
+# camera = None
+# for video_camera in video_cameras:
+#     if video_camera.name is name:
+#         camera = video_camera
+#         break
+# if camera is None:
+#     try:
+#         camera = Camera.objects.get(name=name)
+#         vc = VideoCamera(camera.url, camera.name, camera.type)
+#         video_cameras.append(vc)
+#     except Camera.DoesNotExist:
+#         return HttpResponseRedirect('http://ids.edenlia.icu/img_error.jpg')
+#
+# else:
+#     return StreamingHttpResponse(gen(camera), content_type="multipart/x-mixed-replace;boundary=frame")

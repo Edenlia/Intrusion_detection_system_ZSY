@@ -43,7 +43,7 @@ export default {
   methods:{
     Login(){
       let _this = this
-      api.post("http://127.0.0.1:8000/api/log/login/", {
+      api.post("http://172.30.68.249:8000/api/log/login/", {
         username: this.username,
         password: this.password
       }).then(function(response){

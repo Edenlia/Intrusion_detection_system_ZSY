@@ -36,8 +36,14 @@
   </q-page>
 </template>
 <script>
+import {api} from "boot/axios";
+import {Notify} from "quasar";
+
 export default {
   name: "Case",
+  created(){
+    this.get_user_data()
+  },
   data(){
     return{
       columns: [
@@ -49,158 +55,53 @@ export default {
           field: row => row.id,
           sortable: true
         },
-        { name: 'detected_camera', align: 'center', label: '用户名', field: 'camera_name'},
-        { name: 'case_type', label: '权限类型', field: 'case_type', sortable: true },
-        { name: 'level', label: '摄像头数量', field: 'level' },
-        { name: 'data_time', label: '注册时间', field: 'data_time' },
+        { name: 'user_name', align: 'center', label: '用户名', field: 'user_name'},
+        { name: 'permission', label: '权限类型', field: 'permission'},
+        { name: 'camera_num', label: '摄像头数量', field: 'camera_num' },
+        { name: 'date_time', label: '注册时间', field: 'date_time' },
       ],
-      rows: [
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/12:01:29',
-        },
-        {
-          id: '000002',
-          camera_name: 'user2',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/12:09:39',
-        },
-        {
-          id: '000003',
-          camera_name: 'admin1',
-          case_type: 'admin',
-          level: 0,
-          data_time: '2021/07/27/12:31:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-        {
-          id: '000001',
-          camera_name: 'user1',
-          case_type: '用户',
-          level: 4,
-          data_time: '2021/07/27/13:01:29',
-        },
-      ],
+      rows: []
     }
   },
   methods:{
     go_analytics_detail(evt, row){
       this.$router.push('/admin_user_analytics/' + row.id)
+    },
+    get_user_data(){
+      let _this = this
+      api.post("http://172.30.68.249:8000/api/log/query_all/", {
+
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          let user_list = res.user_list
+          console.log(user_list)
+          for(let i = 0; i < user_list.length; i++){
+            let row = {}
+            row.id = user_list[i].id
+            row.user_name = user_list[i].username
+            row.permission = user_list[i].permission === 0? '用户':'管理员'
+            row.camera_num = user_list[i].camera_num
+            row.date_time = user_list[i].date_time
+            _this.rows.push(row)
+          }
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
     }
   }
 }

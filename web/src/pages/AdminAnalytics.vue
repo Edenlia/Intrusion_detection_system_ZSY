@@ -49,6 +49,8 @@ import {
   GridComponent,
 } from "echarts/components";
 import VChart, {THEME_KEY} from "vue-echarts";
+import axios from "axios";
+import {Notify} from "quasar";
 use([
   CanvasRenderer,
   PieChart,
@@ -67,6 +69,9 @@ export default {
   },
   provide: {
     [THEME_KEY]: "dark"
+  },
+  created(){
+    this.get_admin_data()
   },
   data() {
     return {
@@ -95,7 +100,7 @@ export default {
             radius: "55%",
             center: ["50%", "60%"],
             data: [
-              {value: 335, name: "04:00-11:00"},
+              {value: 333, name: "04:00-11:00"},
               {value: 310, name: "11:00-18:00"},
               {value: 234, name: "18:00-04:00"},
             ],
@@ -242,6 +247,63 @@ export default {
         ]
       },
     };
+  },
+  methods:{
+    get_admin_data(){
+      let _this = this
+      // let user_id = this.user_id
+      // console.log(user_id)
+      axios.post(" http://172.30.68.249:8000/api/count/count_all/", {
+        // id : user_id
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Successes"){
+          _this.option1.series[0].data[0].value = res.case_list[0].morning
+          _this.option1.series[0].data[1].value = res.case_list[0].noon
+          _this.option1.series[0].data[2].value = res.case_list[0].evening
+          _this.option2.series[0].data[0].value = res.case_list[1].morning
+          _this.option2.series[0].data[1].value = res.case_list[1].noon
+          _this.option2.series[0].data[2].value = res.case_list[1].evening
+          _this.option3.series[0].data[0] = res.case_week.monday
+          _this.option3.series[0].data[1] = res.case_week.tuesday
+          _this.option3.series[0].data[2] = res.case_week.wednesday
+          _this.option3.series[0].data[3] = res.case_week.thursday
+          _this.option3.series[0].data[4] = res.case_week.friday
+          _this.option3.series[0].data[5] = res.case_week.saturday
+          _this.option3.series[0].data[6] = res.case_week.sunday
+          console.log(res.register_list[0].monday)
+          _this.option4.series[0].data[0] = res.register_list[0].monday
+          console.log(1)
+          _this.option4.series[0].data[1] = res.register_list[0].tuesday
+          console.log(1)
+          _this.option4.series[0].data[2] = res.register_list[0].wednesday
+          console.log(1)
+          _this.option4.series[0].data[3] = res.register_list[0].thursday
+          console.log(1)
+          _this.option4.series[0].data[4] = res.register_list[0].friday
+          console.log(1)
+          _this.option4.series[0].data[5] = res.register_list[0].saturday
+          console.log(1)
+          _this.option4.series[0].data[6] = res.register_list[0].sunday
+          // console.log(1)
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
+    }
   }
 };
 </script>

@@ -15,7 +15,9 @@ const routes = [
       { path: 'admin_analytics', component: () => import('pages/AdminAnalytics.vue') },
       { path: 'admin_home', component: () => import('pages/AdminHome.vue') },
       { path: 'admin_profile', component: () => import('pages/AdminProfile.vue') },
-      { path: 'admin_user_analytics/:id', component: () => import('pages/AdminUserAnalytics.vue') },
+      { path: 'admin_user_analytics/:id', component: () => import('pages/AdminUserAnalytics.vue'), props: true },
+      { path: 'email', component: () => import('pages/Email')},
+      { path: 'test', component: () => import('pages/test.vue') },
     ]
   },
   // Always leave this as last one,
