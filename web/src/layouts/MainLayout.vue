@@ -77,7 +77,8 @@
           || this.$route.path === '/case'
           || this.$route.path === '/analytics'
           || this.$route.path === '/camera'
-          || this.$route.path === '/profile'"
+          || this.$route.path === '/profile'
+          "
           style="background: #001529"
           class="text-white"
           dense
@@ -103,7 +104,8 @@
           v-if="this.$route.path === '/admin_home'
           || this.$route.path === '/admin_analytics'
           || this.$route.path === '/admin_profile'
-          || this.$route.path === '/admin_user_analytics'"
+          || this.$route.path === '/admin_user_analytics'
+          || this.$route.path === '/car_brand'"
           style="background: #001529"
           class="text-white"
           dense
@@ -131,7 +133,8 @@
           v-if="this.$route.path === '/admin_home'
           || this.$route.path === '/admin_analytics'
           || this.$route.path === '/admin_profile'
-          || this.$route.path === '/admin_user_analytics'"
+          || this.$route.path === '/admin_user_analytics'
+          || this.$route.path === '/car_brand'"
           style="background: #001529"
           class="text-white"
           dense
@@ -145,6 +148,12 @@
               <q-icon name="account_circle"></q-icon>
             </q-item-section>
             <q-item-section>修改个人信息</q-item-section>
+          </q-item>
+          <q-item class="text-grey-1" style="background: #000c17" to="/car_brand">
+            <q-item-section side>
+              <q-icon name="directions_car_filled"></q-icon>
+            </q-item-section>
+            <q-item-section>添加车牌</q-item-section>
           </q-item>
           <q-item class="text-grey-1" style="background: #000c17" to="/">
             <q-item-section side>

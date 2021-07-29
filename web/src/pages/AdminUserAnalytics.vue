@@ -3,6 +3,21 @@
     <div class=" full-width column bg-black" style="height: 760px">
       <!--      style="height: 650px"-->
       <q-btn style="width: 100px;" class="bg-blue absolute-top-left" label="返回" @click="back"></q-btn>
+      <q-btn style="width: 100px;" class="bg-red absolute-top-right" label="删除用户" @click="delete_dialog = true"></q-btn>
+      <q-dialog v-model="delete_dialog" >
+        <q-card style="width: 400px">
+          <q-card-section class="text-h4">
+            警告
+          </q-card-section>
+          <q-card-section>
+            您真的要删除该用户吗？
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn flat label="返回" color="primary" v-close-popup />
+            <q-btn flat label="确认" color="primary" @click="delete_user" v-close-popup />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
       <div class="col row ">
         <div class="col-6 column">
           <div class="title1 col-1 justify-center">一个月内统计数据</div>
@@ -81,6 +96,7 @@ export default {
   },
   data() {
     return {
+      delete_dialog: false,
       option1: {
         title: {
           text: "入侵者年龄段",
@@ -285,6 +301,40 @@ export default {
     };
   },
   methods:{
+    delete_user(){
+      let _this = this
+      let user_id = this.id
+      console.log(user_id)
+      axios.post("http://172.30.68.249:8000/api/log/delete_account/", {
+        id : user_id
+      }).then(function(response){
+        console.log(response)
+        let res = response.data
+        if(res.status === "Success"){
+          Notify.create(
+            {
+              type: 'positive',
+              message: '成功删除'
+            }
+          )
+          _this.back()
+        }else{
+          Notify.create(
+            {
+              type: 'negative',
+              message: '未知错误'
+            }
+          )
+        }
+      }).catch(function (error){
+        console.log(error)
+        Notify.create(
+          {
+            type: 'negative',
+            message: '内部错误'
+          })
+      })
+    },
     back(){
       this.$router.go(-1)
     },

@@ -18,6 +18,7 @@ const routes = [
       { path: 'admin_user_analytics/:id', component: () => import('pages/AdminUserAnalytics.vue'), props: true },
       { path: 'email', component: () => import('pages/Email')},
       { path: 'test', component: () => import('pages/test.vue') },
+      { path: 'car_brand', component: () => import('pages/CarBrand.vue') },
     ]
   },
   // Always leave this as last one,

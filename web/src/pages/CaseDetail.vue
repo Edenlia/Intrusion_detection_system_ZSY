@@ -83,7 +83,7 @@ export default {
         if(res.status === "Success"){
           if(res.case_type === 1) _this.case_type = "未知车辆闯入"
           else if(res.case_type === 2) _this.case_type = "未知人员闯入"
-          else _this.case_type = "敏感区域人员闯入"
+          else _this.case_type = "禁区有人员入侵"
           _this.level = res.level
           _this.date_time = res.date_time
           _this.checked = res.checked
