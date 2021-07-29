@@ -10,7 +10,7 @@ import json
 import datetime
 from django.utils import timezone
 # 导入model中的User
-from .models import User, Camera, Case
+from .models import User, Camera, Case, Car_Record
 
 # 代码编码规则
 # 下划线命名法
@@ -553,39 +553,39 @@ def add_case(request):
         dic['status'] = "Failed"
         dic['message'] = "Wrong Method"
         return HttpResponse(json.dumps(dic))
+
     try:
+        print("run in")
         post_content = json.loads(request.body)
         case_type = post_content['case_type']
         case_description = post_content['case_description']
-        detect_camera_id=post_content['detect_camera_id']
-        camera=Camera.objects.get(id=detect_camera_id)
-        case = Case.objects.get(case_description=case_description)
-
-
+        img = post_content['img']
+        detect_camera_id = post_content['detect_camera_id']
+        camera = Camera.objects.get(id=detect_camera_id)
+        if case_type == 1:
+            car_record = Car_Record.objects.get(car_brand=case_description)
+            # 首先查找不是记录的摄像头，然后异常里面再添加异常
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
         return HttpResponse(json.dumps(dic))
-    except Camera.DoesNotExist:
-        dic['status']='Failed'
-        dic['message']='Wrong Camera_id'
-    except Case.DoesNotExist:
-        dic['status'] = "Failed"
+    except Car_Record.DoesNotExist:
+        dic['status'] = 'Failed'
         if case_type == 1:
             # 上传图片
             key = case_description + '.jpg'
-            data = post_content['img']
-
-            send_img_to_server(ak, sk, bn, key, data)
+            send_img_to_server(ak, sk, bn, key, img)
             # http: // ids.edenlia.icu / img_error.jpg
             img = "http://ids.edenlia.icu/" + key
             # 添加异常
-            new_case=Case(case_type=case_type,case_description=case_description,level=3,img=img,
-                          delete_camera=camera)
+            new_case = Case(case_type=case_type, case_description=case_description, level=3, img=img,
+                            detect_camera=camera)
             new_case.save()
-
-
+        dic['message']='Add Car_case'
         return HttpResponse(json.dumps(dic))
+    except Camera.DoesNotExist:
+        dic['status'] = 'Failed'
+        dic['message'] = 'Wrong Camera_id'
 
     dic['status'] = "Success"
     return HttpResponse(json.dumps(dic))
@@ -944,31 +944,31 @@ def add_admin(request):
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
 
+# @csrf_exempt
+# def add_case(request):
+#     dic = {}
+#     if request.method != 'POST':
+#         dic['status'] = "Failed"
+#         dic['message'] = "Wrong Method"
+#         return HttpResponse(json.dumps(dic))
+#     try:
+#         post_content = json.loads(request.body)
+#         case_type = post_content['case_type']
+#         case_description = post_content['case_description']
+#         level = post_content['level']
+#         img = post_content['img']
+#         detect_camera_id = post_content['detect_camera_id']  # 数字id即可
+#         new_case = Case(case_type=case_type, case_description=case_description, level=level, img=img,
+#                         detect_camera_id=detect_camera_id)
+#         new_case.save()
+#     except(KeyError, json.decoder.JSONDecodeError):
+#         dic['status'] = "Failed"
+#         dic['message'] = "No Input"
+#         return HttpResponse(json.dumps(dic))
+#
+#     dic['status'] = "Success"
+#     return HttpResponse(json.dumps(dic))
 
-@csrf_exempt
-def add_case(request):
-    dic = {}
-    if request.method != 'POST':
-        dic['status'] = "Failed"
-        dic['message'] = "Wrong Method"
-        return HttpResponse(json.dumps(dic))
-    try:
-        post_content = json.loads(request.body)
-        case_type = post_content['case_type']
-        case_description = post_content['case_description']
-        level = post_content['level']
-        img = post_content['img']
-        detect_camera_id = post_content['detect_camera_id']  # 数字id即可
-        new_case = Case(case_type=case_type, case_description=case_description, level=level, img=img,
-                        detect_camera_id=detect_camera_id)
-        new_case.save()
-    except(KeyError, json.decoder.JSONDecodeError):
-        dic['status'] = "Failed"
-        dic['message'] = "No Input"
-        return HttpResponse(json.dumps(dic))
-
-    dic['status'] = "Success"
-    return HttpResponse(json.dumps(dic))
 # def start_camera(url):
 #     camera = Camera.objects.get(url=url)
 #     for video_camera in video_cameras:

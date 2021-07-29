@@ -15,6 +15,24 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 import requests
 
+import cv2
+import numpy as np
+from qiniu import Auth, put_file, etag
+import qiniu.config
+
+ak = 'gllUD3Ik4X7BaXw44GBY6jKfqI9K5qLhNCFZ7uf8'
+sk = 'La3cQhn95ATO4pACyogVtHWxeFvkLejMEwHh1vVv'
+bn = 'intrusion-detection-system'
+
+
+def send_img_to_server(AK, SK, BUCKET_NAME, KEY, DATA):
+    # 构建鉴权对象
+    q = Auth(AK, SK)
+    # 生成上传 Token，可以指定过期时间等
+    token = q.upload_token(BUCKET_NAME, KEY, 3600)
+    # 要上传文件的本地路径
+    ret, info = put_file(token, KEY, DATA, version='v2')
+
 
 class VideoCameras(object):
     def __init__(self):
@@ -79,18 +97,25 @@ class VideoCamera1(object):
 
         if response:
             newStr = my_result['words_result']['number']
+            print(newStr)
+
+            # key = newStr+'.jpg'
+            # data = 'Car.jpg'
+            #
+            # send_img_to_server(ak, sk, bn, key, data)
 
             data = {
-                "case_type": "1",
+                "case_type": 1,
                 "case_description": newStr,
-                "img": img01,
-                "detect_camera_id":2
-
+                "img":"Car.jpg",
+                "detect_camera_id": 2
 
             }
             headers = {'Content-Type': 'application/json'}
-            response = requests.post(url='http://192.168.43.93:8000/api/log/login/', headers=headers,
+            response = requests.post(url='http://172.30.68.249:8000/api/case/add_case/', headers=headers,
                                      data=json.dumps(data))
+            print(response.json())
+
 
             # 发送邮件
             conntent = "异常车辆进入！异常车辆进入！"

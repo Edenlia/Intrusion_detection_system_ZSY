@@ -19,6 +19,7 @@ urlpatterns = [
     path('camera/query_camera_detail/', views.query_camera_detail, name='query_camera_detail'),
     path('camera/query_camera/', views.query_camera, name='query_camera'),
 
+    path('case/add_case/',views.add_case),
     path('case/delete_case/', views.delete_case, name='delete_case'),
     path('case/change_checked/', views.change_checked, name='change_checked'),
     path('case/query_all_case/', views.query_all_case, name='query_all_case'),
