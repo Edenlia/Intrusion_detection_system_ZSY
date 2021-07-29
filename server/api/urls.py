@@ -29,5 +29,7 @@ urlpatterns = [
     path('count/count_all/', views.count_all),
     path('count/count_user/',views.count_user),
 
+    path('car/add_car_record/',views.add_car_record),
+
     # path('live/<name>', views.live, name='live'),
 ]

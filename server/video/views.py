@@ -1,24 +1,18 @@
-from django.http import HttpResponse, StreamingHttpResponse
-import numpy as np
-from django.views.decorators.csrf import csrf_exempt
-import cv2
-import threading
-from django.views.decorators import gzip
-from imutils.object_detection import non_max_suppression
-import time
-import pygame
 import base64
-import smtplib
 import json
-from email.mime.text import MIMEText
+import smtplib
+import threading
 from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-import requests
+from email.mime.text import MIMEText
 
 import cv2
 import numpy as np
-from qiniu import Auth, put_file, etag
-import qiniu.config
+import requests
+from django.http import StreamingHttpResponse
+from django.views.decorators import gzip
+from django.views.decorators.csrf import csrf_exempt
+from imutils.object_detection import non_max_suppression
+from qiniu import Auth, put_file
 
 ak = 'gllUD3Ik4X7BaXw44GBY6jKfqI9K5qLhNCFZ7uf8'
 sk = 'La3cQhn95ATO4pACyogVtHWxeFvkLejMEwHh1vVv'

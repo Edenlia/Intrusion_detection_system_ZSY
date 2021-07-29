@@ -555,7 +555,7 @@ def add_case(request):
         return HttpResponse(json.dumps(dic))
 
     try:
-        print("run in")
+        # print("run in")
         post_content = json.loads(request.body)
         case_type = post_content['case_type']
         case_description = post_content['case_description']
@@ -569,6 +569,7 @@ def add_case(request):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
         return HttpResponse(json.dumps(dic))
+
     except Car_Record.DoesNotExist:
         dic['status'] = 'Failed'
         if case_type == 1:
@@ -581,7 +582,7 @@ def add_case(request):
             new_case = Case(case_type=case_type, case_description=case_description, level=3, img=img,
                             detect_camera=camera)
             new_case.save()
-        dic['message']='Add Car_case'
+        dic['message'] = 'Add Car_case'
         return HttpResponse(json.dumps(dic))
     except Camera.DoesNotExist:
         dic['status'] = 'Failed'
@@ -645,8 +646,8 @@ def change_checked(request):
     return HttpResponse(json.dumps(dic))
 
 
-# 查询摄像头下面的所有的异常信息
-# id
+# 查询所有的异常信息
+# 用户id
 @csrf_exempt
 def query_all_case(request):
     dic = {}
@@ -912,6 +913,61 @@ def count_user(request):
     return HttpResponse(json.dumps(dic))
 
 
+# 添加车牌
+# 传入车牌号 car_brand
+@csrf_exempt
+def add_car_record(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        car_brand = post_content['car_brand']
+        car_record = Car_Record.objects.get(car_brand=car_brand)
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Car_Record.DoesNotExist:
+        dic['status'] = "Success"
+        # 添加车牌
+        new_car_record = Car_Record(car_brand=car_brand)
+        new_car_record.save()
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Failed"
+    dic['message'] = 'Car_record Exist'
+    return HttpResponse(json.dumps(dic))
+
+
+# 删除车牌
+@csrf_exempt
+def delete_car_record(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+    try:
+        post_content = json.loads(request.body)
+        car_record_id = post_content['id']
+        car_record = Car_Record.objects.get(id=car_record_id)
+        car_record.delete()
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Car_Record.DoesNotExist:
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Id"
+        return HttpResponse(json.dumps(dic))
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
+
+
 # 添加管理员账号
 # post  id
 @csrf_exempt
@@ -943,31 +999,6 @@ def add_admin(request):
         user.save()
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
-
-# @csrf_exempt
-# def add_case(request):
-#     dic = {}
-#     if request.method != 'POST':
-#         dic['status'] = "Failed"
-#         dic['message'] = "Wrong Method"
-#         return HttpResponse(json.dumps(dic))
-#     try:
-#         post_content = json.loads(request.body)
-#         case_type = post_content['case_type']
-#         case_description = post_content['case_description']
-#         level = post_content['level']
-#         img = post_content['img']
-#         detect_camera_id = post_content['detect_camera_id']  # 数字id即可
-#         new_case = Case(case_type=case_type, case_description=case_description, level=level, img=img,
-#                         detect_camera_id=detect_camera_id)
-#         new_case.save()
-#     except(KeyError, json.decoder.JSONDecodeError):
-#         dic['status'] = "Failed"
-#         dic['message'] = "No Input"
-#         return HttpResponse(json.dumps(dic))
-#
-#     dic['status'] = "Success"
-#     return HttpResponse(json.dumps(dic))
 
 # def start_camera(url):
 #     camera = Camera.objects.get(url=url)
