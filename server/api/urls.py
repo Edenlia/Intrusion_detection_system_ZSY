@@ -19,15 +19,17 @@ urlpatterns = [
     path('camera/query_camera_detail/', views.query_camera_detail, name='query_camera_detail'),
     path('camera/query_camera/', views.query_camera, name='query_camera'),
 
-    path('case/add_case/',views.add_case),
+    path('case/add_case/', views.add_case),
     path('case/delete_case/', views.delete_case, name='delete_case'),
     path('case/change_checked/', views.change_checked, name='change_checked'),
     path('case/query_all_case/', views.query_all_case, name='query_all_case'),
     path('case/query_case/', views.query_case, name='query_case'),
 
+    path('add_car/', views.add_car, name='add_car'),
+
 
     path('count/count_all/', views.count_all),
-    path('count/count_user/',views.count_user),
+    path('count/count_user/', views.count_user),
 
     # path('live/<name>', views.live, name='live'),
 ]

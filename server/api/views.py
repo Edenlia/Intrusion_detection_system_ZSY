@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.views.decorators import gzip
 from django.views.decorators.csrf import csrf_exempt
-
+import random
 import json
 import datetime
 from django.utils import timezone
@@ -562,26 +562,50 @@ def add_case(request):
         img = post_content['img']
         detect_camera_id = post_content['detect_camera_id']
         camera = Camera.objects.get(id=detect_camera_id)
-        if case_type == 1:
-            car_record = Car_Record.objects.get(car_brand=case_description)
-            # 首先查找不是记录的摄像头，然后异常里面再添加异常
-    except(KeyError, json.decoder.JSONDecodeError):
-        dic['status'] = "Failed"
-        dic['message'] = "No Input"
-        return HttpResponse(json.dumps(dic))
-    except Car_Record.DoesNotExist:
-        dic['status'] = 'Failed'
-        if case_type == 1:
+        flag = False
+        try:
+            if case_type == 1:
+                car_record = Car_Record.objects.get(car_brand=case_description)
+                # 首先查找不是记录的摄像头，然后异常里面再添加异常
+        except Car_Record.DoesNotExist:
+            flag = True
+        if case_type != 1:
+            flag = True
+        if flag:
             # 上传图片
-            key = case_description + '.jpg'
+            key_flag = False
+            my_key = '0.jpg'
+            while key_flag is False:
+                try:
+                    url = 'http://ids.edenlia.icu/' + my_key
+                    case = Case.objects.get(img=url)
+                    my_key = str(random.randint(0, 10000)) + '.jpg'
+                    # time.strftime('%Y%m%d%H%M', time.localtime(time.time()))) + '.jpg'
+
+                except Case.DoesNotExist:
+                    key_flag = True
+
+            key = my_key
             send_img_to_server(ak, sk, bn, key, img)
             # http: // ids.edenlia.icu / img_error.jpg
             img = "http://ids.edenlia.icu/" + key
             # 添加异常
-            new_case = Case(case_type=case_type, case_description=case_description, level=3, img=img,
-                            detect_camera=camera)
+            level = 0
+            if case_type == 1:
+                level = 2
+            elif case_type == 2:
+                level = 3
+            else:
+                level = 4
+            time = datetime.datetime.now() + datetime.timedelta(hours=8)
+            new_case = Case(case_type=case_type, case_description=case_description, level=level, img=img,
+                            detect_camera=camera, date_time=time)
             new_case.save()
-        dic['message']='Add Car_case'
+            dic['message'] = "Add case successfully"
+        dic['message'] = 'The car had recorded'
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
         return HttpResponse(json.dumps(dic))
     except Camera.DoesNotExist:
         dic['status'] = 'Failed'
@@ -895,8 +919,6 @@ def count_user(request):
                     dics['e45_65'] = dics['e45_65'] + 1
                 elif 65 <= age < 100:
                     dics['e65_100'] = dics['e65_100'] + 1
-
-
     except(KeyError, json.decoder.JSONDecodeError):
         dic['status'] = "Failed"
         dic['message'] = "No Input"
@@ -943,6 +965,31 @@ def add_admin(request):
         user.save()
         dic['status'] = 'Successes'
         return HttpResponse(json.dumps(dic))
+
+
+@csrf_exempt
+def add_car(request):
+    dic = {}
+    if request.method != 'POST':
+        dic['status'] = "Failed"
+        dic['message'] = "Wrong Method"
+        return HttpResponse(json.dumps(dic))
+
+    try:
+        post_content = json.loads(request.body)
+        car_brand = post_content['car_brand']
+        new_car = Car_Record(car_brand=car_brand)
+        new_car.save()
+    except(KeyError, json.decoder.JSONDecodeError):
+        dic['status'] = "Failed"
+        dic['message'] = "No Input"
+        return HttpResponse(json.dumps(dic))
+    except Camera.DoesNotExist:
+        dic['status'] = 'Failed'
+        dic['message'] = 'Wrong Camera_id'
+
+    dic['status'] = "Success"
+    return HttpResponse(json.dumps(dic))
 
 # @csrf_exempt
 # def add_case(request):

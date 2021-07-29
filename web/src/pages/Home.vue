@@ -1,35 +1,80 @@
 <template>
   <q-page class="flex" style="background: #f0f2f5">
     <div class=" full-width column bg-white q-ma-md" style="height: 650px">
-      <div class="col-6 row q-py-md">
-        <div class="col-6 q-px-md column">
-          <div class="text-center col-1">摄像头1</div>
-          <div class="col">
-            <img style="width: 577px; height: 268px"
-                 src="http://172.30.68.249:8000/video/test1">
-          </div>
-          </div>
-        </div>
-        <div class="col-6 q-px-md column">
-          <div class="text-center col-1">摄像头2</div>
-          <div class="col">
-
+      <div class="col-6 column">
+        <div class="text-h4 col-4 text-center">摄像头1: 已连接</div>
+        <div class="col row">
+          <div class="col"></div>
+          <q-btn round style="width: 150px; height: 150px" @click="camera1_dialog = true">
+            <q-avatar size="150px">
+              <img src="http://ids.edenlia.icu/camera.jpg"/>
+            </q-avatar>
+          </q-btn>
+          <q-dialog
+            v-model="camera1_dialog"
+          >
+            <q-card style="height: 400px; width: 640px">
+              <img style="width: 640px; height: 360px" src="http://172.30.68.249:8000/video/test1">
+            </q-card>
+          </q-dialog>
+          <div class="col"></div>
         </div>
       </div>
-      <div class="col-6 row q-py-md">
-        <div class="col-6 q-px-md column">
-          <div class="text-center col-1">摄像头3</div>
-          <div class="col">
-            <img style="width: 577px; height: 268px"
-                 :src="camera_urls[2] === ''?'http://ids.edenlia.icu/img_error.jpg':camera_urls[2]">
-          </div>
+      <div class="col-6 column">
+        <div class="text-h4 col-4 text-center">摄像头2: 已连接</div>
+        <div class="col row">
+          <div class="col"></div>
+          <q-btn round style="width: 150px; height: 150px" @click="camera2_dialog = true">
+            <q-avatar size="150px">
+              <img src="http://ids.edenlia.icu/camera.jpg"/>
+            </q-avatar>
+          </q-btn>
+          <q-dialog
+            v-model="camera2_dialog"
+          >
+            <q-card style="height: 400px; width: 640px">
+              <img style="width: 640px; height: 360px" src="http://172.30.68.249:8000/video/test2">
+            </q-card>
+          </q-dialog>
+          <div class="col"></div>
         </div>
-        <div class="col-6 q-px-md column">
-          <div class="text-center col-1">摄像头4</div>
-          <div class="col">
-            <img style="width: 577px; height: 268px"
-                 :src="camera_urls[3] === ''?'http://ids.edenlia.icu/img_error.jpg':camera_urls[3]">
-          </div>
+      </div>
+      <div class="col-6 column">
+        <div class="text-h4 col-4 text-center">摄像头3: 已连接</div>
+        <div class="col row">
+          <div class="col"></div>
+          <q-btn round style="width: 150px; height: 150px" @click="camera3_dialog = true">
+            <q-avatar size="150px">
+              <img src="http://ids.edenlia.icu/camera.jpg"/>
+            </q-avatar>
+          </q-btn>
+          <q-dialog
+            v-model="camera3_dialog"
+          >
+            <q-card style="height: 400px; width: 640px">
+              <img style="width: 640px; height: 360px" src="http://172.30.68.249:8000/video/test3">
+            </q-card>
+          </q-dialog>
+          <div class="col"></div>
+        </div>
+      </div>
+      <div class="col-6 column">
+        <div class="text-h4 col-4 text-center">摄像头4: 未连接</div>
+        <div class="col row">
+          <div class="col"></div>
+          <q-btn round style="width: 150px; height: 150px" @click="camera4_dialog = true">
+            <q-avatar size="150px">
+              <img src="http://ids.edenlia.icu/camera.jpg"/>
+            </q-avatar>
+          </q-btn>
+          <q-dialog
+            v-model="camera4_dialog"
+          >
+            <q-card style="height: 400px; width: 640px">
+              <img style="width: 640px; height: 360px" src="http://ids.edenlia.icu/img_error.jpg">
+            </q-card>
+          </q-dialog>
+          <div class="col"></div>
         </div>
       </div>
     </div>
@@ -55,6 +100,10 @@ export default {
   },
   data(){
     return{
+      camera1_dialog: false,
+      camera2_dialog: false,
+      camera3_dialog: false,
+      camera4_dialog: false,
       user_id: "",
       img_error_url: 'img_error.jpg',
       camera_urls: ['', '', '', ''],
