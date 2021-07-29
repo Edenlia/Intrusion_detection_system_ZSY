@@ -29,13 +29,15 @@ class Camera(models.Model):
     type = models.IntegerField()  # case type 1 未知车辆闯入 case type 2 未知人员闯入 case type 3 敏感区域有人闯入
     url = models.CharField(max_length=100)
     description = models.TextField()
-
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='user'
+    )
 
 
 class Case(models.Model):
     id = models.BigAutoField(primary_key=True)
     checked = models.BooleanField(default=0)
-    case_type = models.IntegerField()  # case type 1 未知车辆闯入 case type 2 未知人员闯入 case type 3 敏感区域有人闯入
+    case_type = models.IntegerField()   # case type 1 未知车辆闯入 case type 2 未知人员闯入 case type 3 敏感区域有人闯入
     case_description = models.TextField()  # 描述信息
     level = models.IntegerField()
     date_time = models.DateTimeField(default=datetime.now())
@@ -49,7 +51,5 @@ class Case(models.Model):
 class Car_Record(models.Model):
     id = models.BigAutoField(primary_key=True)
     car_brand = models.TextField()
-    user_id = models.ForeignKey(
-        User, on_delete=models.CASCADE, ralated_name='user'
-    )
+
 # Create your models here.

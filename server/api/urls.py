@@ -30,6 +30,6 @@ urlpatterns = [
     path('count/count_user/',views.count_user),
 
     path('car/add_car_record/',views.add_car_record),
-
+    path('car/delete_car_record/',views.delete_car_record),
     # path('live/<name>', views.live, name='live'),
 ]
